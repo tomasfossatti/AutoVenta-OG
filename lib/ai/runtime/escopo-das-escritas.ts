@@ -126,6 +126,8 @@ export const ESCOPO_DAS_ESCRITAS: Readonly<Record<string, Readonly<Record<string
   crm_close_demand: { lead_id: "negocio" },
   crm_propose_reactivation: { lead_id: "negocio" },
   crm_draft_proposal: { lead_id: "negocio", conversation_id: "conversa" },
+  // Fork AutoVenta: o pedido de tasação do usado só no negócio do cliente do turno.
+  autoventa_pedir_tasacion: { lead_id: "negocio" },
   // #3316 — proposta de campo lida num documento: só o card (o proposto entra
   // em `lead_field_proposals`, nunca no card; confirma quem atende na tela).
   crm_propose_lead_fields_from_document: {

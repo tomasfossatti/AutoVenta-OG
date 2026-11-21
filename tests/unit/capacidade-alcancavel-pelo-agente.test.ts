@@ -82,6 +82,11 @@ const ESCRITA_QUE_E_TRABALHO_DE_ATENDENTE: ReadonlyArray<string> = [
   "crm_propose_lead_fields_from_document",
   // `app/api/v1/leads/[id]/move/` — exige `agent`. Mover card é o trabalho do dia.
   "crm_move_lead_stage",
+  // Fork AutoVenta — `app/api/v1/leads/[id]/tasaciones/` — POST `{accion:"pedir"}`
+  // exige `agent`: pedir a tasação do usado é trabalho do vendedor na conversa.
+  // A ferramenta só abre o pedido SEM valor (`pendiente`); quem põe valor é o
+  // gerente, e o banco recusa valor vindo de quem não é (migration 9904).
+  "autoventa_pedir_tasacion",
   // `app/api/v1/messages/` — exige `agent`. Responder cliente é o trabalho do dia.
   "crm_send_whatsapp_message",
   // #4129 — `lib/mcp/tools/messages.ts`: mesma rota e mesmo papel da irmã acima

@@ -86,6 +86,8 @@ export const ALVO_DE_FUNIL: Record<string, AlvoDeFunil> = {
   // Recebe lead_id direto — mesmo alvo de crm_update_lead: o funil sai do
   // negócio informado, uma consulta.
   crm_draft_proposal: "funil_vem_do_lead",
+  // Fork AutoVenta: o pedido de tasação é do negócio informado (`lead_id`).
+  autoventa_pedir_tasacion: "funil_vem_do_lead",
   // Cria o negócio NOVO no MESMO funil da origem (issue #1538): o `stage_id`
   // opcional é recusado se for de outro funil, então o alvo é o funil do lead.
   crm_retomar_lead: "funil_vem_do_lead",

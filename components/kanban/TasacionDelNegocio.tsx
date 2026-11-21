@@ -208,7 +208,7 @@ function CartaoDaTasacion({ tasacion, destaque = false }: { tasacion: Tasacion; 
     >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span
-          className={cn("rounded px-2 py-0.5 text-xs font-medium", COR_DA_SITUACAO[tasacion.situacion])}
+          className={cn("rounded-md px-2 py-0.5 text-xs font-medium", COR_DA_SITUACAO[tasacion.situacion])}
           data-testid="tasacion-situacao"
         >
           {t(ROTULOS_DA_SITUACAO[tasacion.situacion])}
