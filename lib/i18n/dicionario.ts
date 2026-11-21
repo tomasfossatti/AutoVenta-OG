@@ -34,6 +34,7 @@
 import { TEXTOS_CADENCIAS } from "./cadencias";
 import { TEXTOS_CADENCIAS_ORIGINAIS } from "./cadencias-originais";
 import { entradaDoCatalogo } from "./catalogos";
+import { TEXTOS_RIOPLATENSES } from "./rioplatense";
 import type { Idioma } from "./idiomas";
 import { TEXTOS_AGENDA_CONFIGURACAO } from "./agenda-configuracao";
 import { TEXTOS_AGENDA_SERVICOS } from "./agenda-servicos";
@@ -22932,5 +22933,11 @@ export const DICIONARIO: Traducoes = {
  */
 export function traduzir(texto: string, idioma: Idioma): string {
   if (idioma === "pt-BR") return texto;
+  // Fork AutoVenta: o voseo rioplatense vence o `es` neutro onde a camada tem
+  // a frase (`./rioplatense`). Fora dela, o caminho de sempre.
+  if (idioma === "es") {
+    const rioplatense = TEXTOS_RIOPLATENSES[texto];
+    if (rioplatense !== undefined) return rioplatense;
+  }
   return DICIONARIO[texto]?.[idioma] ?? entradaDoCatalogo(idioma, texto) ?? texto;
 }
