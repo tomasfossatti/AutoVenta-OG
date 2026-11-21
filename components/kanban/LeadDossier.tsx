@@ -23,6 +23,8 @@ import { RevisaoDoDocumento } from "./RevisaoDoDocumento";
 import { ScoreSlot } from "./ScoreSlot";
 import { LeadTimeline } from "./LeadTimeline";
 import { PropostasDoNegocio } from "./PropostasDoNegocio";
+import { TasacionDelNegocio } from "./TasacionDelNegocio";
+import { funilTemUsado } from "@/lib/autoventa/tasacion";
 import { TarefasDoNegocio } from "./TarefasDoNegocio";
 import { OwnerBadge } from "./OwnerBadge";
 import { EtapaNoDossie } from "./EtapaNoDossie";
@@ -233,6 +235,9 @@ export function LeadDossier({
   // que a rota de decisão exige (`requireRole("agent")`). Abaixo disso a fila
   // ainda aparece — ler o que a IA leu é informação —, mas sem os botões.
   const podeConfirmarDoDocumento = podeEditarTarefas;
+  // Fork AutoVenta: tasar é do gerente (a mesma régua de criar proposta);
+  // pedir e registrar a resposta do cliente é do vendedor, como as tarefas.
+  const podeTasar = podeCriarProposta && !user.support;
 
   /**
    * As props da linha do tempo, montadas UMA vez e usadas nos dois estados da
@@ -431,6 +436,20 @@ export function LeadDossier({
     </SecaoDoDossie>
   );
 
+  /* Fork AutoVenta — o usado em parte de pagamento e a tasação, logo depois
+     dos campos do usado. Só no funil que tem esses campos (o "Ventas"):
+     qualquer outro funil vê o dossiê de antes, sem seção vazia. */
+  const tasacion = funilTemUsado(fieldDefs) ? (
+    <SecaoDoDossie
+      id="tasacion-del-usado"
+      titulo={t("Usado e tasação")}
+      recolhida={fechadas.has("tasacion-del-usado")}
+      aoAlternar={alternar}
+    >
+      <TasacionDelNegocio leadId={lead.id} podeTasar={podeTasar} podeResponder={podeEditarTarefas} />
+    </SecaoDoDossie>
+  ) : null;
+
   /* As tarefas SEGUEM antes da linha do tempo: a timeline conta o que já
      aconteceu, a tarefa é o que ainda falta fazer — e quem abre o card
      para agir procura o próximo passo primeiro. Não entram no
@@ -546,6 +565,7 @@ export function LeadDossier({
             {contato}
             {numeros}
             {dadosDoNegocio}
+            {tasacion}
           </div>
           {/* O que se acompanha. */}
           <div className="flex min-w-0 flex-col gap-4">
@@ -603,6 +623,7 @@ export function LeadDossier({
         {contato}
         {numeros}
         {dadosDoNegocio}
+        {tasacion}
         {tarefas}
         {linhaDoTempo}
         {propostas}

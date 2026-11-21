@@ -923,6 +923,15 @@ export const AUDIT_ACTIONS = [
   /** A rodada da fonte de catálogo (#3587, fatia 2) — cria, atualiza e desativa em lote. */
   "catalog_products.synced_from_feed",
 
+  // Fork AutoVenta (migration 9904): a tasação do usado em parte de pagamento.
+  // O valor que a agência oferece pelo auto do cliente é o número mais
+  // disputado da operação — quem pediu, quem tasou, por quanto e o que o
+  // cliente respondeu ficam registrados.
+  "autoventa_tasacion.requested",
+  "autoventa_tasacion.valued",
+  "autoventa_tasacion.decided",
+  "autoventa_tasacion.updated",
+
   // O serviço no catálogo (#3372, migration 9419): sinal, prazo e preço do
   // serviço são combinados com o cliente, e quem mudou precisa ficar registrado
   // como no produto. A variação tem ação própria porque é outro preço — o valor

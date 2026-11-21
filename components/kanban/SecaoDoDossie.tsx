@@ -43,7 +43,13 @@ export const CHAVE_DAS_SECOES_RECOLHIDAS = "dossie:secoes-recolhidas";
  * seção dos números do cliente (#3669), que só existe quando há relacionado.
  * `Tarefas` e `Propostas` ficam de fora.
  */
-export type IdDeSecao = "contato" | "numeros-do-negocio" | "dados-do-negocio" | "linha-do-tempo";
+export type IdDeSecao =
+  | "contato"
+  | "numeros-do-negocio"
+  | "dados-do-negocio"
+  | "linha-do-tempo"
+  /** Fork AutoVenta: o usado e a tasação (só no funil com os campos do usado). */
+  | "tasacion-del-usado";
 
 function gravar(fechadas: Set<string>): void {
   try {

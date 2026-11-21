@@ -2982,6 +2982,73 @@ export type Database = {
           },
         ];
       };
+      autoventa_tasaciones: {
+        Row: {
+          created_at: string;
+          creada_por: string | null;
+          estado: string;
+          id: string;
+          lead_id: string;
+          moneda: string | null;
+          notas: string | null;
+          organization_id: string;
+          origen: string;
+          tasada_en: string | null;
+          tasada_por: string | null;
+          updated_at: string;
+          valor_cents: number | null;
+          vence_en: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          created_at?: string;
+          creada_por?: string | null;
+          estado?: string;
+          id?: string;
+          lead_id: string;
+          moneda?: string | null;
+          notas?: string | null;
+          organization_id: string;
+          origen?: string;
+          tasada_en?: string | null;
+          tasada_por?: string | null;
+          updated_at?: string;
+          valor_cents?: number | null;
+          vence_en?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          creada_por?: string | null;
+          estado?: string;
+          id?: string;
+          lead_id?: string;
+          moneda?: string | null;
+          notas?: string | null;
+          organization_id?: string;
+          origen?: string;
+          tasada_en?: string | null;
+          tasada_por?: string | null;
+          updated_at?: string;
+          valor_cents?: number | null;
+          vence_en?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "autoventa_tasaciones_lead_id_fkey";
+            columns: ["lead_id"];
+            isOneToOne: false;
+            referencedRelation: "crm_leads";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "autoventa_tasaciones_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       before_send_traces: {
         Row: {
           channel_session_id: string;
@@ -15747,7 +15814,9 @@ export type Database = {
         Returns: Json;
       };
       fn_autonomous_turn_revoked: { Args: { p_job: string; p_org: string }; Returns: boolean };
+      fn_autoventa_campos_del_usado: { Args: Record<PropertyKey, never>; Returns: Json };
       fn_autoventa_sembrar_embudo_ventas: { Args: { p_organization_id: string }; Returns: string };
+      fn_autoventa_sumar_campos_del_usado: { Args: { p_settings: Json }; Returns: Json };
       fn_buscar_trechos_das_fontes: {
         Args: {
           p_embedding: string;
