@@ -9,6 +9,7 @@
  * Service role bypassa RLS: TODA query filtra `organization_id` manualmente, e a
  * fonte é sempre `ctx.organizationId` (token/cookie), NUNCA o input.
  */
+import { fichaParaOAgente, fichasDosProdutos, unidadeDisponivel } from "@/lib/catalogo/vehiculo";
 import { z } from "zod";
 
 import type { McpToolDefinition } from "../types";
@@ -329,7 +330,20 @@ export const crmSearchProducts: McpToolDefinition<typeof produtosInputShape> = {
     const achados = vitrine ? vitrine.principalNoLugar(busca.achados) : busca.achados;
     // Serviço não tem prateleira: a tela de produtos e a planilha podem marcar
     // `controla_estoque` num item de serviço, e ele não some por "sem estoque".
-    const temEstoque = (p: Linha) => vitrine?.ehServico(p.id) || !p.controla_estoque || p.quantidade > 0;
+    // Fork AutoVenta: a unidade com ficha de veículo está à venda só no estado
+    // `disponible` — reservada, señada ou vendida não é oferecida, tenha a
+    // contagem que tiver. Ler as fichas falhando LANÇA (`fichasDosProdutos`):
+    // tratar como "sem ficha" ofereceria uma unidade vendida.
+    const fichas = await fichasDosProdutos(
+      ctx.supabase,
+      ctx.organizationId,
+      achados.map((a) => a.produto.id),
+    );
+    const temEstoque = (p: Linha) => {
+      const ficha = fichas.get(p.id);
+      if (ficha) return unidadeDisponivel(ficha);
+      return vitrine?.ehServico(p.id) || !p.controla_estoque || p.quantidade > 0;
+    };
 
     // `controla_estoque` é o conserto de uma armadilha da versão anterior, que
     // filtrava por quantidade sempre: numa loja que não conta estoque (decant de
@@ -347,8 +361,14 @@ export const crmSearchProducts: McpToolDefinition<typeof produtosInputShape> = {
           // Existe, mas ninguém pode comprar. Para a auditoria isto é vazio
           // declarado — "não achei um produto que dê para vender" —, não sucesso.
           motivo: "sem_estoque" satisfies MotivoDeVazio,
-          mensagem:
-            "esse produto existe no catálogo, mas está sem estoque. Não prometa: ofereça avisar quando chegar.",
+          // Fork AutoVenta: unidade com ficha que não está `disponible` não é
+          // "sem estoque": está reservada, señada ou vendida, e o cliente
+          // precisa ouvir isso de um vendedor, não um "aviso quando chegar".
+          mensagem: achados.some((a) => fichas.has(a.produto.id))
+            ? "essa unidade está no catálogo, mas não está disponível (" +
+              [...new Set(achados.flatMap((a) => fichas.get(a.produto.id)?.estado ?? []))].join(", ") +
+              "). Não a ofereça como disponível, não informe o preço dela e passe a conversa a um vendedor."
+            : "esse produto existe no catálogo, mas está sem estoque. Não prometa: ofereça avisar quando chegar.",
         };
       }
       // Afirmar ausência exige ter varrido o catálogo inteiro. Sobre uma
@@ -400,6 +420,8 @@ export const crmSearchProducts: McpToolDefinition<typeof produtosInputShape> = {
         ...(produto.capacidade ? { capacidade: produto.capacidade } : {}),
         // Serviço não tem prateleira: `temEstoque` também pergunta à vitrine.
         disponivel: temEstoque(produto),
+        // Fork AutoVenta: a ficha do veículo, quando a unidade tem uma.
+        ...(fichas.has(produto.id) ? { vehiculo: fichaParaOAgente(fichas.get(produto.id)!) } : {}),
         // Quantas fotos, e não quais: o caminho é vocabulário interno e a URL
         // assinada expira. Quem manda a foto é o `send_message` do agente, com
         // `produto_codigo` — ele acha as fotos pelo código (migration 0390).

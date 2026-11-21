@@ -31,6 +31,8 @@ function ctxCom(produtos: Array<Record<string, unknown>>): McpContext {
     eq: () => query,
     order: () => query,
     range: async () => ({ data: produtos, error: null, count: produtos.length }),
+    // Fork AutoVenta: a leitura das fichas de veículo (nenhuma, aqui).
+    in: async () => ({ data: [], error: null }),
   };
   return {
     organizationId: "22222222-2222-4222-8222-222222222222",
@@ -193,6 +195,9 @@ describe("crm_search_products — catálogo de serviços (módulo opcional)", ()
       // módulo de serviço DESLIGADO, esta é a única outra leitura — e nada do
       // módulo (`catalog_service_details`) é consultado.
       { tabela: "organizations", select: "settings" },
+      // Fork AutoVenta: a ficha do veículo é lida sempre, para decidir a
+      // disponibilidade pela situação da unidade (`lib/catalogo/vehiculo.ts`).
+      { tabela: "catalog_vehicle_details", select: expect.stringContaining("estado") },
     ]);
     // A variação é só mais um produto, como hoje; nenhum bloco de serviço.
     expect(r.produtos.map((p) => p.codigo).sort()).toEqual(["SOCIAL", "SOCIAL-20"]);
