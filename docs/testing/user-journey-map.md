@@ -4550,9 +4550,11 @@ en contenedor + Supabase local), en una organización de QA aislada que `qa-semb
 | Gerente tasa | el gerente carga $ 12.000.000 en pesos; queda "Vigente", con vencimiento a 7 días en el fuso de la agencia | E2E (pantalla) |
 | Respuesta del cliente | el vendedor registra "El cliente aceptó" y la tasación queda "Aceptada por el cliente" | E2E (pantalla) |
 | Celular | 390 px sin scroll lateral | E2E (pantalla) |
+| Operación nueva en pesos | el gerente crea una operación por "Nuevo negocio": "Valor ($)" en el formulario y en la ficha, guardada en ARS | E2E (pantalla) |
+| Tarjeta sin usado | la tarjeta del tablero no muestra "Fotos del usado" cuando la operación no entrega usado (respeta `mostrar_quando`, como la ficha) | E2E (pantalla) + `tests/unit/arquivo-no-card-respeita-mostrar-quando.test.ts` |
 
 Banco (RLS entre agencias, solo el gerente pone valor, transiciones, un pedido abierto por operación, valor
 inmutable, CHECK, cascada): `tests/invariants/autoventa-etapa-3.test.ts`. Agente (sin valor salvo tasación
 vigente, cerca del cliente del turno, pedido idempotente): `tests/unit/autoventa-tasacion-agente.test.ts`.
 **No medido acá:** la conversación real por WhatsApp con un modelo de IA usando las dos herramientas.
-Evidencia: `evidence/autoventa-etapa-3/01-vendedor-ve-el-usado-sin-tasacion.png`, `evidence/autoventa-etapa-3/02-vendedor-pidio-la-tasacion.png`, `evidence/autoventa-etapa-3/03-gerente-carga-la-tasacion.png`, `evidence/autoventa-etapa-3/04-gerente-tasacion-vigente.png`, `evidence/autoventa-etapa-3/05-vendedor-cliente-acepto.png`, `evidence/autoventa-etapa-3/06-celular-seccion-tasacion.png`.
+Evidencia: `evidence/autoventa-etapa-3/01-vendedor-ve-el-usado-sin-tasacion.png`, `evidence/autoventa-etapa-3/02-vendedor-pidio-la-tasacion.png`, `evidence/autoventa-etapa-3/03-gerente-carga-la-tasacion.png`, `evidence/autoventa-etapa-3/04-gerente-tasacion-vigente.png`, `evidence/autoventa-etapa-3/05-vendedor-cliente-acepto.png`, `evidence/autoventa-etapa-3/06-celular-seccion-tasacion.png`, `evidence/autoventa-etapa-3/07-gerente-nuevo-negocio-en-pesos.png`, `evidence/autoventa-etapa-3/08-ficha-del-negocio-en-pesos.png`.

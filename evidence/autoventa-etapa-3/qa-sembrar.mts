@@ -94,6 +94,10 @@ async function sembrar() {
       stage_id: (etapa as { id: string }).id,
       contact_id: (contato as { id: string }).id,
       title: "Martina Gómez · Hilux SRV con Cruze en permuta",
+      // A moeda da organização, como o produto grava (`createLeadHandler`,
+      // `fn_nascer_lead_da_conversa`). Sem ela o insert direto pegava o default
+      // da coluna (BRL) e a tela mostrava "Valor (R$)" numa agência em pesos.
+      currency: "ARS",
       custom_fields: {
         usado_entrega: true,
         usado_marca: "Chevrolet",
@@ -113,7 +117,11 @@ async function sembrar() {
   if (eLead || !lead) throw new Error(`lead: ${eLead?.message}`);
   writeFileSync(
     CREDS,
-    JSON.stringify({ senha, gerente: GERENTE, vendedor: VENDEDOR, orgId, leadId: (lead as { id: string }).id }, null, 2),
+    JSON.stringify(
+      { senha, gerente: GERENTE, vendedor: VENDEDOR, orgId, leadId: (lead as { id: string }).id, funilId: (funil as { id: string }).id },
+      null,
+      2,
+    ),
     { mode: 0o600 },
   );
   console.log("QA semeada:", orgId, (lead as { id: string }).id);

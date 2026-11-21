@@ -7,7 +7,11 @@
  *   2. o GERENTE abre a mesma operação, vê o pedido pendente e carga a tasação
  *      em pesos, com o vencimento padrão de 7 dias;
  *   3. o VENDEDOR registra que o cliente aceitou;
- *   4. a mesma tela no celular (390 px), sem rolagem lateral.
+ *   4. a mesma tela no celular (390 px), sem rolagem lateral;
+ *   5. o GERENTE cria uma operação por "Nuevo negocio", como uma pessoa faria, e
+ *      o valor dela está em pesos — "Valor ($)", não "Valor (R$)" — no
+ *      formulário e na ficha; e o card dela, sem usado, não mostra "Fotos del
+ *      usado" (o campo que a ficha esconde pela condição).
  *
  *   pnpm exec tsx evidence/autoventa-etapa-3/qa-recorrido.mts http://192.168.68.106:3000
  */
@@ -17,7 +21,7 @@ import { chromium, expect, type Page } from "@playwright/test";
 const BASE = process.argv[2] ?? "http://localhost:3000";
 const PASTA = "evidence/autoventa-etapa-3";
 const creds = JSON.parse(readFileSync(`${PASTA}/.qa-creds.json`, "utf8")) as {
-  senha: string; gerente: string; vendedor: string; leadId: string;
+  senha: string; gerente: string; vendedor: string; leadId: string; funilId: string;
 };
 const ESPERA = 30_000;
 
@@ -98,6 +102,28 @@ try {
   expect(lateral, "rolagem lateral no celular").toBeLessThanOrEqual(0);
   await mPage.getByTestId("tasacion-del-negocio").screenshot({ path: `${PASTA}/06-celular-seccion-tasacion.png` });
   console.log("✓ celular sin scroll lateral");
+
+  // 5. Operación nueva por la pantalla: nace en la moneda de la agencia
+  await g.goto(`${BASE}/app/pipelines/${creds.funilId}`);
+  await g.getByRole("button", { name: "Nuevo negocio" }).first().click();
+  const dialogo = g.getByRole("dialog");
+  await expect(dialogo.locator('label[for="valueReais"]')).toHaveText("Valor ($)", { timeout: ESPERA });
+  const titulo = `Consulta por Amarok ${Date.now().toString(36)}`;
+  await dialogo.locator("#title").fill(titulo);
+  await dialogo.locator("#valueReais").fill("28.500.000");
+  await captura(g, "07-gerente-nuevo-negocio-en-pesos");
+  await dialogo.getByRole("button", { name: "Crear negocio" }).click();
+  await expect(dialogo).toHaveCount(0, { timeout: ESPERA });
+  // Sin usado, la tarjeta no muestra "Fotos del usado" (la ficha tampoco).
+  const tarjeta = g.locator(`[aria-label="Negocio: ${titulo}"]`).first();
+  await expect(tarjeta).toBeVisible({ timeout: ESPERA });
+  await expect(tarjeta.getByTestId("arquivos-do-campo-usado_fotos")).toHaveCount(0);
+  await g.getByText(titulo).first().click();
+  const ficha = g.getByRole("dialog");
+  await expect(ficha.locator('label[for="valueReais"]')).toHaveText("Valor ($)", { timeout: ESPERA });
+  await expect(ficha.getByText("Valor (R$)")).toHaveCount(0);
+  await captura(g, "08-ficha-del-negocio-en-pesos");
+  console.log("✓ operación nueva en pesos: Valor ($) en el formulario y en la ficha");
 } finally {
   await browser.close();
 }
