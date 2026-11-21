@@ -15,14 +15,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FUSO_PADRAO, FUSOS_DO_ONBOARDING } from "@/lib/tempo/fusos";
+import { FUSOS_DO_ONBOARDING } from "@/lib/tempo/fusos";
 import { fusoDoNavegador } from "@/lib/tempo/fuso-do-navegador";
 
 export function WelcomeForm({ defaultOrgName, orgId }: { defaultOrgName: string; orgId: string }) {
   const t = useT();
   const [displayName, setDisplayName] = useState(defaultOrgName);
   const [oQueFaz, setOQueFaz] = useState("");
-  const [timezone, setTimezone] = useState(FUSO_PADRAO);
+  // Fork AutoVenta: as concessionárias são de Neuquén. Sem fuso oferecido vindo
+  // do navegador (Neuquén costuma reportar `America/Argentina/Salta`, que não
+  // está na lista), o passo marca Buenos Aires em vez de São Paulo. O horário é
+  // o mesmo (UTC-3); muda o que a pessoa lê.
+  const [timezone, setTimezone] = useState("America/Argentina/Buenos_Aires");
 
   // O fuso do NAVEGADOR (se for um oferecido) vem marcado no lugar de São
   // Paulo: é o mesmo com que a empresa nasceu (`lib/auth/perfil-da-empresa-nova.ts`),
