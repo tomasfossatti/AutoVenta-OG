@@ -2982,6 +2982,163 @@ export type Database = {
           },
         ];
       };
+      autoventa_cierres: {
+        Row: {
+          actualizado_por: string | null;
+          created_at: string;
+          dominio: string | null;
+          entrega_programada: string | null;
+          entrega_registrada_por: string | null;
+          entregado_en: string | null;
+          formulario_08: string;
+          lead_id: string;
+          notas: string | null;
+          organization_id: string;
+          patentamiento: string;
+          transferencia: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          actualizado_por?: string | null;
+          created_at?: string;
+          dominio?: string | null;
+          entrega_programada?: string | null;
+          entrega_registrada_por?: string | null;
+          entregado_en?: string | null;
+          formulario_08?: string;
+          lead_id: string;
+          notas?: string | null;
+          organization_id: string;
+          patentamiento?: string;
+          transferencia?: string;
+          updated_at?: string;
+        };
+        Update: {
+          actualizado_por?: string | null;
+          created_at?: string;
+          dominio?: string | null;
+          entrega_programada?: string | null;
+          entrega_registrada_por?: string | null;
+          entregado_en?: string | null;
+          formulario_08?: string;
+          lead_id?: string;
+          notas?: string | null;
+          organization_id?: string;
+          patentamiento?: string;
+          transferencia?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "autoventa_cierres_lead_id_fkey";
+            columns: ["lead_id"];
+            isOneToOne: true;
+            referencedRelation: "crm_leads";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "autoventa_cierres_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      autoventa_senas: {
+        Row: {
+          anulada_en: string | null;
+          anulada_por: string | null;
+          aplicada_en: string | null;
+          comprobante_id: string | null;
+          creada_por: string | null;
+          created_at: string;
+          estado: string;
+          fecha: string;
+          id: string;
+          lead_id: string;
+          moneda: string;
+          monto_cents: number;
+          motivo_anulacion: string | null;
+          notas: string | null;
+          organization_id: string;
+          product_id: string | null;
+          unidad_descripcion: string;
+          updated_at: string;
+        };
+        ComputedFields: never;
+        Insert: {
+          anulada_en?: string | null;
+          anulada_por?: string | null;
+          aplicada_en?: string | null;
+          comprobante_id?: string | null;
+          creada_por?: string | null;
+          created_at?: string;
+          estado?: string;
+          fecha?: string;
+          id?: string;
+          lead_id: string;
+          moneda: string;
+          monto_cents: number;
+          motivo_anulacion?: string | null;
+          notas?: string | null;
+          organization_id: string;
+          product_id?: string | null;
+          unidad_descripcion?: string;
+          updated_at?: string;
+        };
+        Update: {
+          anulada_en?: string | null;
+          anulada_por?: string | null;
+          aplicada_en?: string | null;
+          comprobante_id?: string | null;
+          creada_por?: string | null;
+          created_at?: string;
+          estado?: string;
+          fecha?: string;
+          id?: string;
+          lead_id?: string;
+          moneda?: string;
+          monto_cents?: number;
+          motivo_anulacion?: string | null;
+          notas?: string | null;
+          organization_id?: string;
+          product_id?: string | null;
+          unidad_descripcion?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "autoventa_senas_comprobante_id_fkey";
+            columns: ["comprobante_id"];
+            isOneToOne: false;
+            referencedRelation: "crm_lead_attachments";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "autoventa_senas_lead_id_fkey";
+            columns: ["lead_id"];
+            isOneToOne: false;
+            referencedRelation: "crm_leads";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "autoventa_senas_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "autoventa_senas_product_id_fkey";
+            columns: ["product_id"];
+            isOneToOne: false;
+            referencedRelation: "catalog_products";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       autoventa_tasaciones: {
         Row: {
           created_at: string;

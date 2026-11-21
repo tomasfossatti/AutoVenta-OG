@@ -49,7 +49,9 @@ export type IdDeSecao =
   | "dados-do-negocio"
   | "linha-do-tempo"
   /** Fork AutoVenta: o usado e a tasação (só no funil com os campos do usado). */
-  | "tasacion-del-usado";
+  | "tasacion-del-usado"
+  /** Fork AutoVenta: a seña e o fechamento (mesmo funil). */
+  | "sena-y-cierre";
 
 function gravar(fechadas: Set<string>): void {
   try {

@@ -1,7 +1,8 @@
 /**
  * Capacidades do fork AutoVenta — o usado em parte de pagamento (etapa 3).
  *
- * Nenhuma das duas põe valor no usado: a tasação é de uma pessoa da equipe.
+ * Nenhuma das duas da tasação põe valor no usado: a tasação é de uma pessoa da
+ * equipe. A da seña (parte 2) só lê: registrar seña é de uma pessoa.
  */
 import { declararTools } from "./tipos";
 
@@ -24,6 +25,16 @@ export const TOOLS_AUTOVENTA = declararTools([
       "Avisa a equipe que um cliente quer entregar o carro em parte de pagamento, com o resumo do que ele contou. Não põe valor: quem tasa é uma pessoa.",
     oQueToca: "Tasação do usado",
     risco: "atencao",
+    pacotes: ["vender"],
+  },
+  {
+    name: "autoventa_ver_cierre",
+    category: "read",
+    rotulo: "Consultar a seña e a papelada",
+    explicacao:
+      "Mostra se a operação tem seña registrada, qual unidade ficou reservada, como estão o 08, a transferência ou o emplacamento e se já foi entregue — sem valores nem data de entrega, para o assistente nunca confirmar um pagamento nem prometer uma data.",
+    oQueToca: "Seña e fechamento",
+    risco: "seguro",
     pacotes: ["vender"],
   },
 ]);

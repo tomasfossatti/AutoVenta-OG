@@ -114,7 +114,17 @@ import { entraPorPacote, type ToolBundle, type ToolRisk } from "./pacotes";
  * em que o `evoluir` exigir 28, o passo volta a ser ele". 29 é o menor teto em
  * que um segundo pacote ainda cabe; não é folga nova.
  */
-export const TETO_TOOLS_POR_AGENTE = 29;
+/*
+ * ═══ Fork AutoVenta: 30 — a leitura da seña entra no default ═════════════════
+ *
+ * `autoventa_ver_cierre` (migration 9905) vai no `vender` pelo mesmo motivo das
+ * da tasação: o prompt da concessionária manda consultá-la quando o cliente
+ * pergunta pela seña, pelos papéis ou pela entrega, e um agente sem ela inventa
+ * ou cala. Medido pelo `tests/unit/pacote-reserva-vaga-da-critica.test.ts`: com o
+ * agente que nasce em 25 capacidades, o `evoluir` (o menor segundo pacote) exige
+ * 30. É a regra de cima: o teto é o menor em que um segundo pacote ainda cabe.
+ */
+export const TETO_TOOLS_POR_AGENTE = 30;
 
 /** O mínimo que a regra precisa saber de uma capacidade. */
 export interface CapacidadeSelecionavel {

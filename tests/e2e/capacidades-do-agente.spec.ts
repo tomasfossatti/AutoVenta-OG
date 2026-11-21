@@ -106,6 +106,9 @@ const TOOLS_DO_SEED = [
   // "Atender" mantêm a conta: 13 + 17 = 30 > 29, recusa por 1 vaga.
   "crm_list_stages",
   "autoventa_ver_tasacion",
+  // Fork AutoVenta, parte 2: o teto subiu de 29 para 30 (`autoventa_ver_cierre` entrou no
+  // `vender`). Mais uma leitura FORA de "Atender": 14 + 17 = 31 > 30, recusa por 1 vaga.
+  "autoventa_ver_cierre",
 ];
 
 /**
@@ -248,8 +251,9 @@ test.describe("Configurar o que o agente pode fazer", () => {
     // recusa. As 8 (4 de agenda + 4 de leitura pura) estão FORA de "Atender", senão
     // a união seria menor que a soma.
     //
-    // Aritmética atual (fork AutoVenta, teto 29): 13 + 17 = 30 > 29, recusa por
-    // 1 vaga; desligar uma do seed deixa 12 + 17 = 29, o teto exato. A conta
+    // Aritmética atual (fork AutoVenta, teto 30): 14 + 17 = 31 > 30, recusa por
+    // 1 vaga; desligar uma do seed deixa 13 + 17 = 30, o teto exato. Com teto 29
+    // (parte 1 do fork): 13 + 17 = 30 > 29. A conta
     // antiga, com teto 27: 11 + 17 = 28 > 27, recusa por 1 vaga; desligar uma das
     // oito deixa 10 + 17 = 27, o teto exato.
     //

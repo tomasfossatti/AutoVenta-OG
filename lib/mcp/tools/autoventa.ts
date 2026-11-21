@@ -10,12 +10,17 @@
  *  - `autoventa_pedir_tasacion` abre o pedido (`pendiente`, sem valor) para a
  *    equipe tasar. Idempotente: pedir de novo devolve o pedido aberto.
  *
- * As duas valem só para o negócio do cliente desta conversa — a mesma cerca
+ * Etapa 3, parte 2: `autoventa_ver_cierre` lê a seña e a papelada da operação.
+ * Só leitura, e sem o monto nem a data de entrega combinada — o agente nunca
+ * registra uma seña nem promete entrega (`lib/autoventa/sena.ts`).
+ *
+ * As três valem só para o negócio do cliente desta conversa — a mesma cerca
  * das leituras de anexo (`lib/leads/anexos-do-negocio.ts`).
  */
 import { z } from "zod";
 
 import { audit } from "@/lib/audit";
+import { condicaoDaUnidade, cierreParaOAgente, lerCierre, listarSenas, senaQueVale } from "@/lib/autoventa/sena";
 import {
   hojeNoFuso,
   listarTasaciones,
@@ -174,6 +179,41 @@ export const autoventaPedirTasacion: McpToolDefinition<typeof pedirInputShape> =
     } catch (err) {
       logger.error("[mcp/autoventa] erro ao pedir tasación", { erro: String(err), lead_id: input.lead_id });
       return FALHA;
+    }
+  },
+};
+
+const FALHA_DO_CIERRE = {
+  erro: "nao_consegui_ler_a_operacion",
+  instruccion:
+    "No pude revisar la seña ni la papelería ahora. No confirmes nada sobre la seña ni la entrega; " +
+    "decile que lo confirma su vendedor.",
+} as const;
+
+export const autoventaVerCierre: McpToolDefinition<typeof verInputShape> = {
+  name: "autoventa_ver_cierre",
+  description:
+    "Muestra si la operación de esta conversación tiene SEÑA registrada, qué unidad quedó reservada y en qué estado " +
+    "está la papelería (formulario 08, transferencia o patentamiento, si ya tiene dominio) y si ya se entregó. " +
+    "Usala cuando la persona pregunte por su seña, sus papeles o la entrega. Solo lectura: no registra señas. " +
+    "No trae montos ni fecha de entrega: nunca confirmes un pago ni prometas una fecha; seguí la `instruccion`.",
+  inputSchema: verInputShape,
+  category: "read",
+  requiresRole: "agent",
+  requiresScope: "mcp:read",
+  handler: async (input, ctx) => {
+    const negocio = await negocioDoTurno(ctx, input.lead_id);
+    if (!negocio.ok) return negocio.resposta;
+    try {
+      const [senas, cierre] = await Promise.all([
+        listarSenas(ctx.supabase, ctx.organizationId, input.lead_id),
+        lerCierre(ctx.supabase, ctx.organizationId, input.lead_id),
+      ]);
+      const condicion = await condicaoDaUnidade(ctx.supabase, ctx.organizationId, senaQueVale(senas)?.product_id ?? null);
+      return cierreParaOAgente(senas, cierre, condicion);
+    } catch (err) {
+      logger.error("[mcp/autoventa] erro ao ler seña y cierre", { erro: String(err), lead_id: input.lead_id });
+      return FALHA_DO_CIERRE;
     }
   },
 };

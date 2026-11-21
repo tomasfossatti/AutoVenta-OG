@@ -24,6 +24,7 @@ import { ScoreSlot } from "./ScoreSlot";
 import { LeadTimeline } from "./LeadTimeline";
 import { PropostasDoNegocio } from "./PropostasDoNegocio";
 import { TasacionDelNegocio } from "./TasacionDelNegocio";
+import { CierreDeLaOperacion } from "./CierreDeLaOperacion";
 import { funilTemUsado } from "@/lib/autoventa/tasacion";
 import { TarefasDoNegocio } from "./TarefasDoNegocio";
 import { OwnerBadge } from "./OwnerBadge";
@@ -450,6 +451,20 @@ export function LeadDossier({
     </SecaoDoDossie>
   ) : null;
 
+  /* Fork AutoVenta, etapa 3, parte 2 — a seña e o fechamento, logo depois da
+     tasação e no mesmo funil. Anular é do gerente (a régua de tasar);
+     registrar, papelada e entrega são do vendedor. */
+  const cierre = funilTemUsado(fieldDefs) ? (
+    <SecaoDoDossie
+      id="sena-y-cierre"
+      titulo={t("Seña e fechamento")}
+      recolhida={fechadas.has("sena-y-cierre")}
+      aoAlternar={alternar}
+    >
+      <CierreDeLaOperacion leadId={lead.id} podeRegistrar={podeEditarTarefas} podeAnular={podeTasar} />
+    </SecaoDoDossie>
+  ) : null;
+
   /* As tarefas SEGUEM antes da linha do tempo: a timeline conta o que já
      aconteceu, a tarefa é o que ainda falta fazer — e quem abre o card
      para agir procura o próximo passo primeiro. Não entram no
@@ -566,6 +581,7 @@ export function LeadDossier({
             {numeros}
             {dadosDoNegocio}
             {tasacion}
+            {cierre}
           </div>
           {/* O que se acompanha. */}
           <div className="flex min-w-0 flex-col gap-4">
@@ -624,6 +640,7 @@ export function LeadDossier({
         {numeros}
         {dadosDoNegocio}
         {tasacion}
+        {cierre}
         {tarefas}
         {linhaDoTempo}
         {propostas}
