@@ -22919,6 +22919,8 @@ export const DICIONARIO: Traducoes = {
   "Não foram levados:": { es: "No se llevaron:" },
   "levados para": { es: "llevados a" },
   "Não foi possível levar este negócio.": { es: "No fue posible llevar este negocio." },
+  // Fork AutoVenta: nome inicial do agente no onboarding (`app/onboarding/setup-ai/_form.tsx`).
+  "Atendente IA": { es: "Asistente de ventas" },
   "ficaram de fora pelo limite de 50 por vez. Selecione-os de novo para levar.": {
     es: "quedaron fuera por el límite de 50 por vez. Selecciónelos de nuevo para llevarlos.",
   },

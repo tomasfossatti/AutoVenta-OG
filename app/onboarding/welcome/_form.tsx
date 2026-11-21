@@ -58,7 +58,7 @@ export function WelcomeForm({ defaultOrgName, orgId }: { defaultOrgName: string;
             toast.error(
               res.error === "organization_changed"
                 ? t("A empresa ativa mudou. Recarregue a página antes de continuar.")
-                : `Falha: ${res.error}`,
+                : `${t("Falha:")} ${res.error}`,
             );
           }
         });

@@ -304,14 +304,14 @@ export function ConnectWhatsappClient({
         if (!res.ok) {
           setInfo((antes) =>
             antes.status === "INIT" || antes.status === "STARTING"
-              ? { status: "ERROR", session: sessionName, error: `o servidor respondeu ${res.status}` }
+              ? { status: "ERROR", session: sessionName, error: `${t("o servidor respondeu")} ${res.status}` }
               : antes,
           );
         }
       } catch {
         setInfo((antes) =>
           antes.status === "INIT" || antes.status === "STARTING"
-            ? { status: "ERROR", session: sessionName, error: "não consegui falar com o servidor" }
+            ? { status: "ERROR", session: sessionName, error: t("não consegui falar com o servidor") }
             : antes,
         );
       }
