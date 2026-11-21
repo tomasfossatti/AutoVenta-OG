@@ -545,7 +545,7 @@ describe("GET /api/v1/products/import — modelo de planilha", () => {
     tokenDe(ORG_A, TOKEN_A, "admin");
     const res = await rotaImportar.GET(pedido("GET", CAMINHO_IMPORTAR, TOKEN_A));
     expect(res.status).toBe(200);
-    expect(await res.text()).toContain("codigo,nome,marca");
+    expect(await res.text()).toContain("codigo,nombre,marca"); // fork AutoVenta: planilla modelo de concesionaria
     expect(falso.cadeias).toEqual([]);
   });
 

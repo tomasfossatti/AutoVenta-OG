@@ -137,7 +137,7 @@ describe("total da coluna do funil", () => {
   it("lead sem valor não entra no total nem traz a moeda dele", () => {
     montar([
       lead({ id: "l3", currency: "BRL", value_cents: null }),
-      lead({ id: "l4", currency: "USD", value_cents: 10000 }),
+      lead({ id: "l4", currency: "MXN", value_cents: 10000 }),
     ]);
 
     const total = screen.getByText((texto) => semNbsp(texto).includes("100.00"));
@@ -194,19 +194,21 @@ describe("total da coluna do funil", () => {
       lead({ id: "e2", currency: "BRL", value_cents: 10_000 }),
     ]);
 
+    // Fork AutoVenta: o dólar sai à argentina, `US$ 200,00`.
     const total = screen.getByText((texto) => semNbsp(texto).includes("100,00"));
-    expect(semNbsp(total.textContent ?? "")).toBe("R$ 100,00 + $200.00");
+    expect(semNbsp(total.textContent ?? "")).toBe("R$ 100,00 + US$ 200,00");
   });
 
-  it("⭐ peso e dólar escrevem '$': cada total leva o código da moeda", () => {
-    // "$1,500.00 + $100.00" não diz qual é o peso e qual é o dólar.
+  // Fork AutoVenta: o dólar já sai `US$`; os dois que escrevem `$` são o peso
+  // argentino e o mexicano.
+  it("⭐ dois pesos escrevem '$': cada total leva o código da moeda", () => {
     montar([
       lead({ id: "m1", currency: "MXN", value_cents: 150_000 }),
-      lead({ id: "m2", currency: "USD", value_cents: 10_000 }),
+      lead({ id: "m2", currency: "ARS", value_cents: 10_000 }),
     ]);
 
     const total = screen.getByText((texto) => semNbsp(texto).includes("1,500.00"));
-    expect(semNbsp(total.textContent ?? "")).toBe("$1,500.00 MXN + $100.00 USD");
+    expect(semNbsp(total.textContent ?? "")).toBe("$ 100,00 ARS + $1,500.00 MXN");
   });
 
   it("⭐ o ponderado com duas moedas separa igual, na mesma ordem do total", () => {

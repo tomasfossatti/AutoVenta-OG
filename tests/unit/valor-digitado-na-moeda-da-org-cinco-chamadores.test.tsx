@@ -3,7 +3,7 @@
  *
  * ⚠️ ESTES TESTES EXISTEM PORQUE O DO PARSER NÃO PROVA O CHAMADOR.
  *
- * `lib/money.test.ts` prova que `parseReaisToCents("1,300", "USD")` devolve
+ * `lib/money.test.ts` prova que `parseReaisToCents("1,300", "MXN")` devolve
  * 130000; não prova que a TELA passa a moeda — um `parseReaisToCents(valor)` sem
  * segundo argumento continuava verde lá, e é exatamente o defeito medido na
  * instalação real (#3331, continuação #3367): organização com `currency = USD`,
@@ -30,7 +30,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 /** `organizations.currency` na sessão — o que `useMoedaDaOrgAtiva` devolve. */
-const sessao = vi.hoisted(() => ({ moeda: "USD" as string }));
+const sessao = vi.hoisted(() => ({ moeda: "MXN" as string }));
 
 vi.mock("@/hooks/i18n/useT", () => ({ useT: () => (s: string) => s }));
 vi.mock("@/hooks/i18n/useLocaleDeData", () => ({
@@ -78,7 +78,7 @@ const COMANDA = {
   discount_cents: 0,
   total_cents: 0,
   // A moeda da própria comanda (#1531) — é ela que a tela já usava no total.
-  currency: "USD",
+  currency: "MXN",
   notes: null,
   finalized_at: null,
   reversed_at: null,
@@ -114,7 +114,7 @@ function renderTela(ui: React.ReactElement) {
 }
 
 beforeEach(() => {
-  sessao.moeda = "USD";
+  sessao.moeda = "MXN";
   api.get.mockReset();
   api.post.mockReset();
   api.patch.mockReset();
@@ -137,7 +137,7 @@ describe("comandas — o preço do item é lido na moeda da comanda aberta (#336
       return { data: [] };
     });
     const usuario = userEvent.setup();
-    renderTela(<Comandas podeLancar podeEstornar moedaDaOrg="USD" />);
+    renderTela(<Comandas podeLancar podeEstornar moedaDaOrg="MXN" />);
 
     await usuario.click(await screen.findByTestId(`comanda-${COMANDA.number}`));
     await usuario.type(await screen.findByTestId("item-descricao"), "Corte");
@@ -179,7 +179,7 @@ describe("faturamento — o lançamento avulso é lido na moeda da organização
   };
 
   it("⭐ dólar: `1,300` grava 130000, e não 130", async () => {
-    const onCriar = montar("USD");
+    const onCriar = montar("MXN");
     await lancar("1,300");
     expect(onCriar).toHaveBeenCalledWith(expect.objectContaining({ amount_cents: 130000 }));
   });

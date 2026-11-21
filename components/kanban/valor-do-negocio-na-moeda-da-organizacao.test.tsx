@@ -3,7 +3,7 @@
  *
  * ⚠️ ESTE CASO EXISTE PORQUE O TESTE DO PARSER NÃO PROVA O CHAMADOR.
  *
- * `lib/money.test.ts` prova que `parseReaisToCents("1,300", "USD")` devolve
+ * `lib/money.test.ts` prova que `parseReaisToCents("1,300", "MXN")` devolve
  * 130000; não prova que a TELA passa a moeda — um `parseReaisToCents(reais)`
  * sem segundo argumento continuava verde lá, e é exatamente o defeito medido
  * na instalação real (#3331): organização com `currency = USD`, a pessoa
@@ -82,7 +82,7 @@ function valorGravado(): number {
 }
 
 beforeEach(() => {
-  orgAtiva.atual = { currency: "USD", country: null, orgId: "org-1" };
+  orgAtiva.atual = { currency: "MXN", country: null, orgId: "org-1" };
   editar.mutateAsync.mockReset();
   editar.mutateAsync.mockResolvedValue({ lead: { id: LEAD_ID } });
 });
@@ -96,7 +96,7 @@ afterEach(() => {
 describe("o valor do negócio é lido na moeda da organização (#3331)", () => {
   it("⭐ dólar: `1,300` grava mil e trezentos dólares, e o eco concorda", async () => {
     const usuario = userEvent.setup();
-    renderForm(<LeadFieldsForm lead={negocio("USD")} pipelineId={FUNIL} />);
+    renderForm(<LeadFieldsForm lead={negocio("MXN")} pipelineId={FUNIL} />);
 
     const campo = screen.getByLabelText(/^Valor \(/);
     await usuario.clear(campo);
