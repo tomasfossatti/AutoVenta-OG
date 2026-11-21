@@ -45,7 +45,7 @@ describe("9901: a organização nova nasce com o embudo Ventas", () => {
       select string_agg(s.name || ':' || coalesce(s.agent_stage_hint,'-'), ',' order by s.position)
         from crm_stages s join crm_pipelines p on p.id=s.pipeline_id where p.organization_id='${ORG_A}';
     `).split("\n");
-    expect(out[0]).toBe("Ventas|t|Interesado|Operación");
+    expect(out[0]).toBe("Ventas|true|Interesado|Operación");
     expect(out[1]).toBe(
       "Consulta nueva:new,Respondida:contacted,Calificando:qualifying,Visita o test drive agendado:qualified," +
         "Tasación y negociación:negotiating,Señado:-,Vendido:won,Perdido:lost",

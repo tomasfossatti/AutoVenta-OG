@@ -118,6 +118,11 @@ revoke all on public.catalog_vehicle_details from anon;
 grant select, insert, update, delete on public.catalog_vehicle_details to authenticated;
 grant all on public.catalog_vehicle_details to service_role;
 
+-- As três travas do modo somente leitura do suporte, depois da tabela: a
+-- varredura percorre `pg_class` no momento em que roda (mesmo molde dos outros
+-- apêndices do baseline).
+do $f$ begin perform public.fn_aplicar_travas_de_suporte(); end $f$;
+
 comment on table public.catalog_vehicle_details is
   'Fork AutoVenta: a ficha do veículo, 1:1 com catalog_products. Preço, moeda e marca ficam em catalog_products. `estado` decide se a unidade é oferecida: só `disponible` conta como disponível (migration 9902).';
 
