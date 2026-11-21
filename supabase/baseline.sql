@@ -88263,4 +88263,248 @@ comment on column public.crm_metas.alvo is
 comment on table public.crm_metas is
   'Meta mensal da organização por indicador (#3025 fatia 1, valor na #4796). `pipeline_id` nulo + `vendedor_id` nulo = meta da EMPRESA; `pipeline_id` preenchido = meta do funil; `vendedor_id` preenchido = meta do vendedor. Leitura org-scoped; escrita manager+ (Server Action definirMetaMensal, com auditoria).';
 
+-- ---- fork AutoVenta: embudo Ventas (migration 9901) ----
+-- manifest: Fork AutoVenta — o funil que toda organização nova recebe passa a ser o "Ventas" de concessionária (8 etapas em espanhol rioplatense, com `agent_stage_hint`) no lugar do "Pedidos" de e-commerce; `fn_autoventa_sembrar_embudo_ventas(org)` semeia o mesmo funil numa organização que já existe, sem apagar nada.
+--
+-- 9901 — o embudo de concesionaria.
+--
+-- `trg_seed_default_pipeline_for_org` semeava em toda organização nova o funil
+-- de e-commerce em português ("Carrinho abandonado", "Em separação"…) e sem
+-- nenhum `agent_stage_hint`, então o agente não conseguia mover card nenhum.
+-- O gatilho continua o mesmo; muda o que ele semeia.
+--
+-- As etapas, cada uma com o passo do agente (`agent_stage_hint`):
+--   Consulta nueva → new · Respondida → contacted · Calificando → qualifying ·
+--   Visita o test drive agendado → qualified · Tasación y negociación →
+--   negotiating · Señado → NULL (só uma pessoa move: a seña é registro do
+--   vendedor) · Vendido → won · Perdido → lost.
+-- `is_won`/`is_lost` seguem o passo, como exige `crm_stages_hint_coerente_com_won_lost`.
+--
+-- ORGANIZAÇÃO QUE JÁ EXISTE: nada muda sozinha. O "Pedidos" pode ter negócios e
+-- é o funil que o agente publicado tem no escopo (`ai_agent_versions.pipeline_ids`);
+-- trocá-lo por migration deixaria o agente sem funil. Quem quiser o "Ventas"
+-- numa organização existente roda `select public.fn_autoventa_sembrar_embudo_ventas('<org>')`
+-- e marca o funil novo no agente pela tela (IA › Agentes).
+--
+-- Reverter: `supabase/fork/revertir/9901_autoventa_embudo_ventas.sql`.
+
+create or replace function public.fn_autoventa_sembrar_embudo_ventas(p_organization_id uuid)
+returns uuid
+language plpgsql
+set search_path = public, pg_temp
+as $fn$
+declare
+  v_pipeline_id uuid;
+  v_position numeric := 1000;
+  r record;
+begin
+  select id into v_pipeline_id
+    from public.crm_pipelines
+   where organization_id = p_organization_id and slug = 'ventas';
+  if v_pipeline_id is not null then
+    return v_pipeline_id;
+  end if;
+
+  -- Um padrão por organização (índice parcial): o "Ventas" só assume o lugar
+  -- quando ainda não há nenhum funil padrão.
+  insert into public.crm_pipelines (organization_id, name, slug, is_default, position, vocabulary)
+  values (
+    p_organization_id,
+    'Ventas',
+    'ventas',
+    not exists (
+      select 1 from public.crm_pipelines
+       where organization_id = p_organization_id and is_default and not is_archived
+    ),
+    1000,
+    jsonb_build_object(
+      'lead', 'Interesado', 'lead_plural', 'Interesados',
+      'deal', 'Operación', 'deal_plural', 'Operaciones',
+      'won', 'Vendido', 'lost', 'Perdido',
+      'stage', 'Etapa', 'stage_plural', 'Etapas'
+    )
+  )
+  returning id into v_pipeline_id;
+
+  for r in
+    select * from (values
+      ('Consulta nueva',               'consulta_nueva',         false, false, 'new'),
+      ('Respondida',                   'respondida',             false, false, 'contacted'),
+      ('Calificando',                  'calificando',            false, false, 'qualifying'),
+      ('Visita o test drive agendado', 'visita_o_test_drive',    false, false, 'qualified'),
+      ('Tasación y negociación',       'tasacion_y_negociacion', false, false, 'negotiating'),
+      ('Señado',                       'senado',                 false, false, null),
+      ('Vendido',                      'vendido',                true,  false, 'won'),
+      ('Perdido',                      'perdido',                false, true,  'lost')
+    ) as t(stage_name, stage_slug, won, lost, hint)
+  loop
+    insert into public.crm_stages
+      (organization_id, pipeline_id, name, slug, position, is_won, is_lost, agent_stage_hint)
+    values
+      (p_organization_id, v_pipeline_id, r.stage_name, r.stage_slug, v_position, r.won, r.lost, r.hint);
+    v_position := v_position + 1000;
+  end loop;
+
+  return v_pipeline_id;
+end
+$fn$;
+
+-- Sem `security definer`: roda com o papel de quem cria a organização (o gatilho)
+-- ou de quem a chama à mão, e a RLS de `crm_pipelines`/`crm_stages` segue valendo.
+
+create or replace function public.fn_seed_default_pipeline_for_org()
+returns trigger
+language plpgsql
+set search_path = public, pg_temp
+as $fn$
+begin
+  perform public.fn_autoventa_sembrar_embudo_ventas(new.id);
+  return new;
+end
+$fn$;
+
+-- ---- fork AutoVenta: ficha do veículo (migration 9902) ----
+-- manifest: Fork AutoVenta — `catalog_vehicle_details`, a ficha do veículo (condição, modelo, versão, ano, km, combustível, câmbio, cor e estado) em tabela 1:1 com `catalog_products`, que não muda; preço, moeda e marca seguem em `catalog_products`.
+--
+-- 9902 — a ficha do veículo.
+--
+-- Mesmo desenho do catálogo de serviços (migration 9432): o que é do ramo mora
+-- numa tabela própria, uma linha por item, e `catalog_products` segue intacta.
+-- É o que deixa as atualizações do upstream entrarem sem conflito no núcleo.
+--
+--   - preço (`preco_cents`), moeda (`moeda`) e marca (`marca`) continuam em
+--     `catalog_products`, que é a fonte que a busca do agente já lê;
+--   - `estado` é o que decide se a unidade está à venda: só `disponible` é
+--     oferecida como disponível; `reservado`, `senado` e `vendido` não;
+--   - sem ficha, o item segue no catálogo como produto comum.
+--
+-- Escrita com o mesmo papel de `catalog_products` (gerente para cima), pela
+-- mesma rota da tela; leitura para a organização.
+--
+-- Reverter: `supabase/fork/revertir/9902_autoventa_ficha_del_vehiculo.sql`.
+
+create table if not exists public.catalog_vehicle_details (
+  product_id uuid primary key references public.catalog_products(id) on delete cascade,
+  organization_id uuid not null references public.organizations(id) on delete cascade,
+  condicion text not null default 'usado',
+  modelo text,
+  version text,
+  anio smallint,
+  kilometros integer,
+  combustible text,
+  transmision text,
+  color text,
+  estado text not null default 'disponible',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint catalog_vehicle_details_condicion_check check (condicion in ('0km', 'usado')),
+  constraint catalog_vehicle_details_modelo_check check (modelo is null or char_length(modelo) <= 80),
+  constraint catalog_vehicle_details_version_check check (version is null or char_length(version) <= 80),
+  constraint catalog_vehicle_details_anio_check check (anio is null or anio between 1950 and 2100),
+  constraint catalog_vehicle_details_kilometros_check check (kilometros is null or kilometros between 0 and 2000000),
+  constraint catalog_vehicle_details_combustible_check check (
+    combustible is null or combustible in ('nafta', 'diesel', 'gnc', 'hibrido', 'electrico')
+  ),
+  constraint catalog_vehicle_details_transmision_check check (
+    transmision is null or transmision in ('manual', 'automatica')
+  ),
+  constraint catalog_vehicle_details_color_check check (color is null or char_length(color) <= 40),
+  constraint catalog_vehicle_details_estado_check check (
+    estado in ('disponible', 'reservado', 'senado', 'vendido')
+  )
+);
+
+create index if not exists catalog_vehicle_details_org_idx
+  on public.catalog_vehicle_details (organization_id, estado);
+
+-- A ficha nunca aponta para produto de outra organização.
+create or replace function public.fn_autoventa_ficha_conferir_organizacao()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $fn$
+begin
+  if not exists (
+    select 1 from public.catalog_products p
+     where p.id = new.product_id and p.organization_id = new.organization_id
+  ) then
+    raise exception 'ficha_de_outra_organizacao' using errcode = '23514';
+  end if;
+  new.updated_at := now();
+  return new;
+end
+$fn$;
+
+revoke all on function public.fn_autoventa_ficha_conferir_organizacao() from public, anon, authenticated;
+
+drop trigger if exists trg_autoventa_ficha_conferir_organizacao on public.catalog_vehicle_details;
+create trigger trg_autoventa_ficha_conferir_organizacao
+  before insert or update on public.catalog_vehicle_details
+  for each row execute function public.fn_autoventa_ficha_conferir_organizacao();
+
+alter table public.catalog_vehicle_details enable row level security;
+
+drop policy if exists catalog_vehicle_details_select on public.catalog_vehicle_details;
+create policy catalog_vehicle_details_select on public.catalog_vehicle_details
+  for select using (
+    (organization_id in (select public.fn_user_org_ids())) or (select public.fn_is_platform_admin())
+  );
+
+drop policy if exists catalog_vehicle_details_insert on public.catalog_vehicle_details;
+create policy catalog_vehicle_details_insert on public.catalog_vehicle_details
+  for insert with check (
+    (select public.fn_is_platform_admin_full())
+    or ((organization_id in (select public.fn_user_org_ids()))
+        and public.fn_role_at_least(organization_id, 'manager'))
+  );
+
+drop policy if exists catalog_vehicle_details_write on public.catalog_vehicle_details;
+create policy catalog_vehicle_details_write on public.catalog_vehicle_details
+  for update using (
+    (select public.fn_is_platform_admin_full())
+    or ((organization_id in (select public.fn_user_org_ids()))
+        and public.fn_role_at_least(organization_id, 'manager'))
+  )
+  with check (
+    (select public.fn_is_platform_admin_full())
+    or ((organization_id in (select public.fn_user_org_ids()))
+        and public.fn_role_at_least(organization_id, 'manager'))
+  );
+
+drop policy if exists catalog_vehicle_details_delete on public.catalog_vehicle_details;
+create policy catalog_vehicle_details_delete on public.catalog_vehicle_details
+  for delete using (
+    (select public.fn_is_platform_admin_full())
+    or ((organization_id in (select public.fn_user_org_ids()))
+        and public.fn_role_at_least(organization_id, 'manager'))
+  );
+
+revoke all on public.catalog_vehicle_details from anon;
+grant select, insert, update, delete on public.catalog_vehicle_details to authenticated;
+grant all on public.catalog_vehicle_details to service_role;
+
+comment on table public.catalog_vehicle_details is
+  'Fork AutoVenta: a ficha do veículo, 1:1 com catalog_products. Preço, moeda e marca ficam em catalog_products. `estado` decide se a unidade é oferecida: só `disponible` conta como disponível (migration 9902).';
+
+notify pgrst, 'reload schema';
+
+-- ---- fork AutoVenta: moeda da organização argentina (migration 9903) ----
+-- manifest: Fork AutoVenta — a organização argentina que nasceu em BRL (o default da coluna, antes de o fork servir ARS) passa a ARS; só toca organização com fuso da Argentina e moeda ainda BRL, e não mexe em produto nem negócio já gravados.
+--
+-- 9903 — a moeda da organização argentina.
+--
+-- Até a etapa 2 do fork, `ARS` não estava entre as moedas servidas e a
+-- organização criada pelo instalador nascia com o default da coluna, `BRL`.
+-- A régua aqui é estreita de propósito: fuso `America/Argentina/*` E moeda
+-- ainda `BRL`. Quem escolheu outra moeda pela tela fica como está, e os
+-- produtos e negócios já gravados mantêm a moeda com que nasceram.
+--
+-- Reverter: `supabase/fork/revertir/9903_autoventa_moneda_argentina.sql`.
+
+update public.organizations
+   set currency = 'ARS'
+ where currency = 'BRL'
+   and timezone like 'America/Argentina/%';
+
 notify pgrst, 'reload schema';
