@@ -81,7 +81,7 @@ describe("o cadastro do segundo fator não mostra o texto cru do GoTrue", () => 
     fireEvent.click(screen.getByRole("button", { name: "Iniciar configuración" }));
     const campos = await screen.findAllByLabelText(/Dígito/);
     campos.forEach((campo, i) => fireEvent.change(campo, { target: { value: String(i + 1) } }));
-    expect(await screen.findByText("No se pudo confirmar. Intenta de nuevo.")).toBeTruthy();
+    expect(await screen.findByText("No se pudo confirmar. Intentá de nuevo.")).toBeTruthy();
     expect(screen.queryByText("MFA challenge failed")).toBeNull();
   });
 });

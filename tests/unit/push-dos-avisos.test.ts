@@ -194,7 +194,7 @@ describe("aviso da Central → celular", () => {
     }) as never);
     await webPushInboundHandler.handle(evento("central.aviso_criado", { item_id: "i8" }));
     const payload = vi.mocked(enviarPushDaOrg).mock.calls[0]![1];
-    expect(payload.body).toBe("La IA preparó una propuesta. Revísala antes de enviar.");
+    expect(payload.body).toBe("La IA preparó una propuesta. Revisala antes de enviarla.");
     // A prova: nenhum resto do texto de passagem para pessoa.
     expect(JSON.stringify(payload)).not.toMatch(/conversación|equipo|responder al cliente/i);
   });

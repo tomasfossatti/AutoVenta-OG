@@ -65,9 +65,9 @@ const DICA_PT =
   "clique em “Editar vocabulário e campos deste funil” e em “Adicionar campo”. " +
   "Em “Este campo pertence a:”, troque para “Contato” e salve. Abrir Etapas do funil em outra aba";
 const DICA_ES =
-  "Puedes crear campos del contacto en la pantalla Etapas del embudo: en el embudo Atendimento - Clínica Sorriso (novo), " +
-  "haz clic en “Editar vocabulario y campos de este embudo” y en “Agregar campo”. " +
-  "En “Este campo pertenece a:”, cambia a “Contacto” y guarda. Abrir Etapas del embudo en otra pestaña";
+  "Podés crear campos del contacto en la pantalla Etapas del embudo: en el embudo Atendimento - Clínica Sorriso (novo), " +
+  "hacé clic en “Editar vocabulario y campos de este embudo” y en “Agregar campo”. " +
+  "En “Este campo pertenece a:”, cambiá a “Contacto” y guardá. Abrir Etapas del embudo en otra pestaña";
 
 const contato = {
   id: "33333333-3333-4333-8333-333333333333",

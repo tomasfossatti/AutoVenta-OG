@@ -81,9 +81,9 @@ describe("(a) acesso: assunto e corpo no mesmo idioma", () => {
     const idioma = idiomaDe("es-MX");
     const html = montarTemplateDeAcesso("confirmation", MARCA, idioma);
 
-    expect(assuntoDoModelo("confirmation", MARCA, idioma)).toBe("Confirma tu correo · Acme");
+    expect(assuntoDoModelo("confirmation", MARCA, idioma)).toBe("Confirmá tu correo · Acme");
     expect(html).toContain('<html lang="es">');
-    expect(html).toContain("Confirma tu correo");
+    expect(html).toContain("Confirmá tu correo");
     expect(html).toContain(
       "Tu cuenta en Acme está casi lista. Haz clic en el botón de abajo para confirmar tu correo y activar tu cuenta.",
     );

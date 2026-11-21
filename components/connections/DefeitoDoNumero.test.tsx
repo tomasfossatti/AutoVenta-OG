@@ -31,7 +31,7 @@ describe("o defeito do número no cartão de Conexões", () => {
   it("⭐ em espanhol", () => {
     abrir("WORKING", DETALHE_NAO_RECEBE, "es");
     expect(screen.getByTestId("defeito-do-numero")).toHaveTextContent(
-      "Meta informa que este número no recibe mensajes. Vuelve a conectar el número.",
+      "Meta informa que este número no recibe mensajes. Volvé a conectar el número.",
     );
   });
 

@@ -91,6 +91,7 @@ export const TEXTOS_RIOPLATENSES: Readonly<Record<string, string>> = {
   "Confira a configuração do agente e tente gerar novamente.": "Revisá la configuración del agente e intentá generar de nuevo.",
   "Confira os campos: algum valor não foi aceito.": "Revisá los campos: algún valor no fue aceptado.",
   "Confirme na ficha do contato se ele pediu para não receber mais mensagens.": "Confirmá en la ficha del contacto si pidió no recibir más mensajes.",
+  "Confirme seu e-mail · {marca}": "Confirmá tu correo · {marca}",
   "Confirme seu e-mail": "Confirmá tu correo",
   "Contato sem nome no CRM: {{nome}}/{{primeiro_nome}} ficaram literais no texto. Edite antes de enviar.": "Contacto sin nombre en el CRM: {{nome}}/{{primeiro_nome}} quedaron como texto literal en el mensaje. Editalo antes de enviar.",
   "Contatos duplicados aparecerão aqui pra revisão.": "Los contactos duplicados van a aparecer acá para que los revises.",
