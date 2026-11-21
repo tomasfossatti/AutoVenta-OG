@@ -4555,6 +4555,4 @@ Banco (RLS entre agencias, solo el gerente pone valor, transiciones, un pedido a
 inmutable, CHECK, cascada): `tests/invariants/autoventa-etapa-3.test.ts`. Agente (sin valor salvo tasación
 vigente, cerca del cliente del turno, pedido idempotente): `tests/unit/autoventa-tasacion-agente.test.ts`.
 **No medido acá:** la conversación real por WhatsApp con un modelo de IA usando las dos herramientas.
-Evidencia: `evidence/autoventa-etapa-3/01-vendedor-ve-el-usado-sin-tasacion.png`, `02-vendedor-pidio-la-tasacion.png`,
-`03-gerente-carga-la-tasacion.png`, `04-gerente-tasacion-vigente.png`, `05-vendedor-cliente-acepto.png`,
-`06-celular-seccion-tasacion.png`.
+Evidencia: `evidence/autoventa-etapa-3/01-vendedor-ve-el-usado-sin-tasacion.png`, `evidence/autoventa-etapa-3/02-vendedor-pidio-la-tasacion.png`, `evidence/autoventa-etapa-3/03-gerente-carga-la-tasacion.png`, `evidence/autoventa-etapa-3/04-gerente-tasacion-vigente.png`, `evidence/autoventa-etapa-3/05-vendedor-cliente-acepto.png`, `evidence/autoventa-etapa-3/06-celular-seccion-tasacion.png`.

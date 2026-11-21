@@ -146,6 +146,11 @@ async function main(): Promise<void> {
     "crm_list_event_types",
     "crm_list_human_cases",
     "crm_list_knowledge_sources",
+    // Fork AutoVenta: o teto subiu de 27 para 29 (as duas capacidades da tasação
+    // entraram no `vender`, ver `selecao-por-pacote.ts`). Mais duas leituras FORA de
+    // "Atender" mantêm a conta: 13 + 17 = 30 > 29, recusa por 1 vaga.
+    "crm_list_stages",
+    "autoventa_ver_tasacion",
   ];
 
   // REPÕE TODAS AS VERSÕES DRAFT DESTE AGENTE, não só a de maior número.
