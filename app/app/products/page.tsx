@@ -21,6 +21,7 @@ import { traduzir } from "@/lib/i18n/dicionario";
 import { moduloLigado } from "@/lib/instalacao/modulos";
 import { capacidadesDaOrganizacao } from "@/lib/organizacao/capacidades";
 import { COLUNAS_DO_PRODUTO, type Produto } from "@/lib/schemas/produtos";
+import { fichasDosProdutos } from "@/lib/catalogo/vehiculo";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
@@ -102,6 +103,9 @@ export default async function ProdutosPage({
     if (error) throw new Error(`Não consegui ler o catálogo: ${error.message}`);
     produtos = (data ?? []) as unknown as Produto[];
     total = count ?? produtos.length;
+    // Fork AutoVenta: a ficha do veículo de cada produto da página.
+    const fichas = await fichasDosProdutos(supabase, activeOrg.orgId, produtos.map((p) => p.id));
+    produtos = produtos.map((p) => ({ ...p, vehiculo: fichas.get(p.id) ?? null }));
   }
 
   // O bucket é privado: a tela recebe URL assinada de 1 h, montada aqui. Só

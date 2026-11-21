@@ -17,6 +17,8 @@ import {
 import type { Produto } from "@/lib/schemas/produtos";
 
 import { CatalogProductAiPresentation } from "./_apresentacao-ia";
+import { CamposDaFicha, fichaDoRascunho, rascunhoDaFicha } from "./_ficha-del-vehiculo";
+import type { MonedaDelVehiculo } from "@/lib/catalogo/vehiculo";
 
 /**
  * O FORMULÁRIO DE EDIÇÃO — o que a tela nunca teve.
@@ -50,16 +52,30 @@ export function EdicaoDoProduto({
   const router = useRouter();
   const [rascunho, setRascunho] = React.useState<RascunhoDaEdicao>(() => rascunhoDaEdicao(produto));
   const [salvando, setSalvando] = React.useState(false);
+  // Fork AutoVenta: a ficha do veículo e a moeda da unidade.
+  const fichaInicial = React.useMemo(() => rascunhoDaFicha(produto.vehiculo), [produto.vehiculo]);
+  const [ficha, setFicha] = React.useState(fichaInicial);
+  const [moeda, setMoeda] = React.useState<MonedaDelVehiculo>(produto.moeda === "USD" ? "USD" : "ARS");
 
   const somenteLeitura = sincronizadoDeOrigem(produto.origem);
   const desabilitado = somenteLeitura || salvando;
 
   async function salvar() {
-    const { corpo, erro } = corpoDaEdicao(rascunho, produto, t);
+    const { corpo: corpoDoProduto, erro } = corpoDaEdicao(rascunho, produto, t);
     if (erro) {
       toast.error(erro);
       return;
     }
+    // Fork AutoVenta: a ficha vai inteira quando mudou (ou quando o produto ainda
+    // não tinha uma), e a moeda só quando mudou.
+    const daFicha = fichaDoRascunho(ficha, t);
+    if ("erro" in daFicha) {
+      toast.error(daFicha.erro);
+      return;
+    }
+    const corpo: Record<string, unknown> = { ...corpoDoProduto };
+    if (!produto.vehiculo || JSON.stringify(ficha) !== JSON.stringify(fichaInicial)) corpo.vehiculo = daFicha.ficha;
+    if (moeda !== produto.moeda) corpo.moeda = moeda;
     if (Object.keys(corpo).length === 0) {
       toast.error(t("Nada para alterar."));
       return;
@@ -179,28 +195,14 @@ export function EdicaoDoProduto({
         </label>
       </div>
 
-      <label className="mt-3 flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={rascunho.controla_estoque}
-          onChange={(e) => setRascunho({ ...rascunho, controla_estoque: e.target.checked })}
-          disabled={desabilitado}
-          data-testid="edicao-controla-estoque"
-        />
-        {t("Controlar estoque deste produto")}
-      </label>
-      {rascunho.controla_estoque ? (
-        <label className="mt-2 block text-sm">
-          {t("Quantidade")}
-          <input
-            value={rascunho.quantidade}
-            onChange={(e) => setRascunho({ ...rascunho, quantidade: e.target.value })}
-            className="mt-1 h-9 w-32 rounded-md border px-3"
-            disabled={desabilitado}
-            data-testid="edicao-quantidade"
-          />
-        </label>
-      ) : null}
+      {/* Fork AutoVenta: no lugar do controle de estoque, a ficha do veículo. */}
+      <CamposDaFicha
+        valor={ficha}
+        aoMudar={setFicha}
+        moeda={moeda}
+        aoMudarMoeda={setMoeda}
+        desabilitado={desabilitado}
+      />
 
       {apresentacaoLigada ? <CatalogProductAiPresentation product={produto} photoUrls={urlsDasFotos} /> : null}
 

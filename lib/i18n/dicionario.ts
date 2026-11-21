@@ -47,11 +47,13 @@ import { TEXTOS_MCP_OAUTH } from "./mcp-oauth";
 import { TEXTOS_TABELA_DE_VALORES } from "./tabela-de-valores";
 import { TEXTOS_DO_MOTOR_GRAVADO } from "./motor-gravado";
 import { TEXTOS_AVISOS_DA_CENTRAL } from "./avisos-da-central";
+import { TEXTOS_AUTOVENTA_VEHICULO } from "./autoventa-vehiculo";
 
 /** `pt-BR` não aparece: é a chave. Só o que DIFERE precisa de linha. */
 type Traducoes = Record<string, Partial<Record<Exclude<Idioma, "pt-BR">, string>>>;
 
 export const DICIONARIO: Traducoes = {
+  ...TEXTOS_AUTOVENTA_VEHICULO,
   ...TEXTOS_PAINEL_GOOGLE_ADS,
   ...TEXTOS_CONTRATACAO,
   ...TEXTOS_MCP_AGENTES,

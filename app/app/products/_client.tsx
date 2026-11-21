@@ -14,6 +14,8 @@ import { formatCents } from "@/lib/money";
 import { precoParaCentavos, type Produto } from "@/lib/schemas/produtos";
 
 import { EdicaoDoProduto } from "./_edicao";
+import { CamposDaFicha, fichaDoRascunho, rascunhoDaFicha, resumoDaFicha } from "./_ficha-del-vehiculo";
+import type { MonedaDelVehiculo } from "@/lib/catalogo/vehiculo";
 
 interface Textos {
   titulo: string;
@@ -265,6 +267,9 @@ export function ProdutosClient({
   }
   const [criando, setCriando] = React.useState(false);
   const [rascunho, setRascunho] = React.useState<Rascunho>(VAZIO);
+  // Fork AutoVenta: a ficha do veículo e a moeda da unidade nova.
+  const [ficha, setFicha] = React.useState(() => rascunhoDaFicha());
+  const [moedaNova, setMoedaNova] = React.useState<MonedaDelVehiculo>("ARS");
   const [salvando, setSalvando] = React.useState(false);
   const [importando, setImportando] = React.useState(false);
   const [resumo, setResumo] = React.useState<ResumoDaImportacao | null>(null);
@@ -298,11 +303,17 @@ export function ProdutosClient({
       toast.error(corpo.erro as string);
       return;
     }
+    const daFicha = fichaDoRascunho(ficha, t);
+    if ("erro" in daFicha) {
+      toast.error(daFicha.erro);
+      return;
+    }
     setSalvando(true);
     try {
-      await apiClient.post("/api/v1/products", corpo);
+      await apiClient.post("/api/v1/products", { ...corpo, vehiculo: daFicha.ficha, moeda: moedaNova });
       toast.success(t("Produto cadastrado"));
       setRascunho(VAZIO);
+      setFicha(rascunhoDaFicha());
       setCriando(false);
       router.refresh();
     } catch (e) {
@@ -546,31 +557,9 @@ export function ProdutosClient({
             </span>
           </label>
 
-          <label className="mt-3 flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={rascunho.controla_estoque}
-              onChange={(e) => setRascunho({ ...rascunho, controla_estoque: e.target.checked })}
-              data-testid="produto-controla-estoque"
-            />
-            {t("Controlar estoque deste produto")}
-          </label>
-          {rascunho.controla_estoque ? (
-            <label className="mt-2 block text-sm">
-              {t("Quantidade")}
-              <input
-                value={rascunho.quantidade}
-                onChange={(e) => setRascunho({ ...rascunho, quantidade: e.target.value })}
-                className="mt-1 h-9 w-32 rounded-md border px-3"
-              />
-            </label>
-          ) : (
-            <p className="mt-2 text-xs text-muted-foreground">
-              {t(
-                "Sem controle de estoque, este produto sempre aparece como disponível para o atendente — é o certo para item sob encomenda ou fracionado.",
-              )}
-            </p>
-          )}
+          {/* Fork AutoVenta: no lugar do controle de estoque, a ficha do veículo.
+              Quem diz se a unidade está à venda é o estado dela. */}
+          <CamposDaFicha valor={ficha} aoMudar={setFicha} moeda={moedaNova} aoMudarMoeda={setMoedaNova} />
 
           <div className="mt-4">
             <Button onClick={salvar} disabled={salvando} data-testid="salvar-produto">
@@ -622,9 +611,11 @@ export function ProdutosClient({
                   {p.codigo}
                   {p.marca ? ` · ${p.marca}` : ""}
                   {capacidadeLigada && p.capacidade ? ` · ${p.capacidade}` : ""}
-                  {p.controla_estoque
-                    ? ` · ${p.quantidade} ${t("em estoque")}`
-                    : ` · ${t("sem controle de estoque")}`}
+                  {p.vehiculo
+                    ? ` · ${resumoDaFicha(p.vehiculo, t)}`
+                    : p.controla_estoque
+                      ? ` · ${p.quantidade} ${t("em estoque")}`
+                      : ` · ${t("sem controle de estoque")}`}
                   {/* Sem descrição, o atendente de IA só sabe nome e preço: a lista diz onde falta. */}
                   {p.descricao?.trim() ? "" : ` · ${t("sem descrição")}`}
                 </p>
