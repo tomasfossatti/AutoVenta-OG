@@ -55,7 +55,7 @@ export function EdicaoDoProduto({
   // Fork AutoVenta: a ficha do veículo e a moeda da unidade.
   const fichaInicial = React.useMemo(() => rascunhoDaFicha(produto.vehiculo), [produto.vehiculo]);
   const [ficha, setFicha] = React.useState(fichaInicial);
-  const [moeda, setMoeda] = React.useState<MonedaDelVehiculo>(produto.moeda === "USD" ? "USD" : "ARS");
+  const [moeda, setMoeda] = React.useState<string>(produto.moeda);
 
   const somenteLeitura = sincronizadoDeOrigem(produto.origem);
   const desabilitado = somenteLeitura || salvando;
@@ -66,15 +66,14 @@ export function EdicaoDoProduto({
       toast.error(erro);
       return;
     }
-    // Fork AutoVenta: a ficha vai inteira quando mudou (ou quando o produto ainda
-    // não tinha uma), e a moeda só quando mudou.
+    // Fork AutoVenta: a ficha vai inteira quando mudou, e a moeda só quando mudou.
     const daFicha = fichaDoRascunho(ficha, t);
     if ("erro" in daFicha) {
       toast.error(daFicha.erro);
       return;
     }
     const corpo: Record<string, unknown> = { ...corpoDoProduto };
-    if (!produto.vehiculo || JSON.stringify(ficha) !== JSON.stringify(fichaInicial)) corpo.vehiculo = daFicha.ficha;
+    if (JSON.stringify(ficha) !== JSON.stringify(fichaInicial)) corpo.vehiculo = daFicha.ficha;
     if (moeda !== produto.moeda) corpo.moeda = moeda;
     if (Object.keys(corpo).length === 0) {
       toast.error(t("Nada para alterar."));
@@ -200,7 +199,7 @@ export function EdicaoDoProduto({
         valor={ficha}
         aoMudar={setFicha}
         moeda={moeda}
-        aoMudarMoeda={setMoeda}
+        aoMudarMoeda={(m: MonedaDelVehiculo) => setMoeda(m)}
         desabilitado={desabilitado}
       />
 
