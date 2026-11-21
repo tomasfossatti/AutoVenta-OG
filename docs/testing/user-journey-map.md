@@ -4535,3 +4535,26 @@ ausentes (sin WAHA, Redis, Resend ni claves de IA).
 Banco (RLS entre agencias, solo el gerente cambia el estado, CHECK, cascada): `tests/invariants/autoventa-etapa-2.test.ts`.
 **No medido acá:** la respuesta del agente por WhatsApp real con el stock cargado.
 Evidencia: `evidence/autoventa-etapa-2/00-lista-de-embudos.png`, `evidence/autoventa-etapa-2/01-embudo-ventas.png`, `evidence/autoventa-etapa-2/02-alta-con-ficha.png`, `evidence/autoventa-etapa-2/03-unidad-en-el-stock.png`, `evidence/autoventa-etapa-2/04-planilla-importada.png`, `evidence/autoventa-etapa-2/05-edicion-senado.png`, `evidence/autoventa-etapa-2/06-unidad-senada.png`.
+
+## J-autoventa-3 — Usado en parte de pago y tasación, en español `[P1]` (2026-11-21)
+
+Fork AutoVenta, etapa 3. Migration 9904 (campos `usado_*` en el embudo "Ventas" y `autoventa_tasaciones`).
+Recorrido: `evidence/autoventa-etapa-3/qa-recorrido.mts` contra el stack local (`pnpm local:up`: `next start`
+en contenedor + Supabase local), en una organización de QA aislada que `qa-sembrar.mts` crea y borra
+(`--apagar`), con un gerente y un vendedor reales y la interfaz en español. Sin claves de IA ni WhatsApp.
+
+| Caso | Qué prueba | Cómo |
+|---|---|---|
+| Datos del usado | con "¿Entrega usado?" en sí, la operación muestra marca, modelo, km, combustible, transmisión, color, dueños, estado y fotos | E2E (pantalla) |
+| Vendedor pide | sin tasación, el vendedor ve "Pedir tasación" y no ve "Cargar tasación"; al pedir queda "Pendiente" | E2E (pantalla) |
+| Gerente tasa | el gerente carga $ 12.000.000 en pesos; queda "Vigente", con vencimiento a 7 días en el fuso de la agencia | E2E (pantalla) |
+| Respuesta del cliente | el vendedor registra "El cliente aceptó" y la tasación queda "Aceptada por el cliente" | E2E (pantalla) |
+| Celular | 390 px sin scroll lateral | E2E (pantalla) |
+
+Banco (RLS entre agencias, solo el gerente pone valor, transiciones, un pedido abierto por operación, valor
+inmutable, CHECK, cascada): `tests/invariants/autoventa-etapa-3.test.ts`. Agente (sin valor salvo tasación
+vigente, cerca del cliente del turno, pedido idempotente): `tests/unit/autoventa-tasacion-agente.test.ts`.
+**No medido acá:** la conversación real por WhatsApp con un modelo de IA usando las dos herramientas.
+Evidencia: `evidence/autoventa-etapa-3/01-vendedor-ve-el-usado-sin-tasacion.png`, `02-vendedor-pidio-la-tasacion.png`,
+`03-gerente-carga-la-tasacion.png`, `04-gerente-tasacion-vigente.png`, `05-vendedor-cliente-acepto.png`,
+`06-celular-seccion-tasacion.png`.
