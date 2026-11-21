@@ -371,7 +371,11 @@ jobs:
       # contra o REMOTO (e o script busca a base: o checkout daqui não traz origin/main).
       - name: Colisão de número de migration
         if: matrix.parte == 1
-        run: pnpm checar:colisao-de-migration
+        # A base é a do PR: num fork cuja branch padrão não se chama `main`, o
+        # padrão `origin/main` do script não existe e o passo terminava em NÃO MEDIDO.
+        env:
+          BASE_DO_PR: ${{ github.base_ref || 'main' }}
+        run: pnpm checar:colisao-de-migration "origin/$BASE_DO_PR"
 
       # POR QUE NÃO HÁ UMA CAMADA "o número foi tomado depois da prévia": o
       # passo acima JÁ É ELA. O script busca a base no remoto no instante do job
