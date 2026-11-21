@@ -33,6 +33,12 @@ const TELAS_DO_CAMINHO_MINIMO = [
   "app/(public)/signup",
   "components/inbox",
   "components/connections",
+  // Etapa 2 do fork: o embudo, a ficha do veículo e o catálogo.
+  "app/app/kanban",
+  "app/app/pipelines",
+  "app/app/crm",
+  "app/app/products",
+  "components/kanban",
 ] as const;
 
 // `\b` do JavaScript só conhece letra ASCII ("Ten" casaria em "Tenés" e "aquí"
@@ -110,6 +116,10 @@ const PERMITIDOS = new Set([
   "Prueba ejecutada.",
   "Prueba",
   "Cuenta",
+  "Activa",
+  "Marca",
+  "Etiqueta",
+  "Etiqueta: todas",
 ]);
 
 describe("o detector de tuteo distingue tú de vos", () => {
