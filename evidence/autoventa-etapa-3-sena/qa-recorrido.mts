@@ -67,8 +67,9 @@ async function estadoNoEstoque(page: Page, codigo: string, esperado: RegExp) {
 }
 
 async function etapaDoNegocio(leadId: string): Promise<string> {
-  const { data } = await admin.from("crm_leads").select("crm_stages!inner(name)").eq("id", leadId).single();
-  return (data as unknown as { crm_stages: { name: string } }).crm_stages.name;
+  const { data: lead } = await admin.from("crm_leads").select("stage_id").eq("id", leadId).single();
+  const { data: etapa } = await admin.from("crm_stages").select("name").eq("id", (lead as { stage_id: string }).stage_id).single();
+  return (etapa as { name: string }).name;
 }
 
 const browser = await chromium.launch();

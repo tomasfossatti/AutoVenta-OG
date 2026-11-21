@@ -21,11 +21,11 @@ import {
   erroDePapel,
   listarUnidadesSenables,
   motivoDoErroDaSena,
-  moverParaSenado,
   negocioDaOperacao,
   registrarSena,
   registrarSenaSchema,
 } from "@/lib/autoventa/sena";
+import { moverParaSenado } from "@/lib/autoventa/mover-para-senado";
 import { hojeNoFuso } from "@/lib/autoventa/tasacion";
 import { traduzir } from "@/lib/i18n/dicionario";
 import { IDIOMA_PADRAO } from "@/lib/i18n/idiomas";
