@@ -80,7 +80,7 @@ describe("seedPlatformPlaybook (boot do worker, self-host)", () => {
 
     const loaded = await loadPlaybook(pool, ORG);
     expect(loaded.prompt).toContain("=== playbook:platform ===");
-    expect(loaded.prompt).toContain("Nunca afirme ser humano");
+    expect(loaded.prompt).toContain("Nunca digas que sos una persona"); // fork AutoVenta: platform.md em rioplatense
     expect(loaded.versionIds.platform).toBe(after.pointerVersionId);
   });
 

@@ -27,6 +27,7 @@
  */
 export const TEXTOS_RIOPLATENSES: Readonly<Record<string, string>> = {
   " — se sair desta tela sem copiá-lo, exclua a conexão e conecte de novo para gerar outro.": ". Si salís de esta pantalla sin copiarlo, eliminá la conexión y volvé a conectar para generar otro.",
+  "## Idioma da conversa\nEsta organização atende em português (Brasil). Responda ao lead nesse idioma e no idioma em que ele escrever — siga a pessoa, não imponha o seu. O texto das suas instruções internas não é a língua do atendimento: se o lead escreve em espanhol ou em inglês, a resposta sai em espanhol ou em inglês, mesmo que as regras acima estejam em português.": "## Idioma de la conversación\nEsta organización atiende en español rioplatense, con voseo (\"vos\", \"tenés\", \"podés\", \"contame\"). Respondé en ese español salvo que la persona escriba en otro idioma; en ese caso, seguí el idioma de la persona. El idioma de tus instrucciones internas no es el idioma de la atención.",
   "(é para cá que vão as conversas novas)": "(acá van las conversaciones nuevas)",
   "). Desligue um pacote que você usa menos antes.": "). Antes, desactivá un paquete que uses menos.",
   ", clique em “Editar vocabulário e campos deste funil” e em “Adicionar campo”. Em “Este campo pertence a:”, troque para “Contato” e salve.": ", hacé clic en “Editar vocabulario y campos de este embudo” y en “Agregar campo”. En “Este campo pertenece a:”, cambiá a “Contacto” y guardá.",

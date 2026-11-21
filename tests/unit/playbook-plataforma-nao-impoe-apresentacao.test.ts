@@ -35,10 +35,19 @@ describe("platform.md não impõe apresentação ao agente", () => {
   it("não manda se apresentar como assistente virtual", () => {
     expect(PLATFORM).not.toMatch(/apresente-se como assistente virtual/i);
     expect(PLATFORM).not.toMatch(/Você é um assistente virtual/i);
+    // Fork AutoVenta: o texto é em espanhol rioplatense.
+    expect(PLATFORM).not.toMatch(/presentate como asistente virtual/i);
+    expect(PLATFORM).not.toMatch(/Sos un asistente virtual/i);
   });
 
   it("mantém a regra de não afirmar ser humano e de responder com honestidade", () => {
-    expect(PLATFORM).toMatch(/Nunca afirme ser humano/);
-    expect(PLATFORM).toMatch(/responda com honestidade/);
+    // Fork AutoVenta: as mesmas duas regras, em espanhol rioplatense.
+    expect(PLATFORM).toMatch(/Nunca digas que sos una persona/);
+    expect(PLATFORM).toMatch(/respondé con honestidad/);
+  });
+
+  it("fork AutoVenta: manda atender em espanhol rioplatense, não em português", () => {
+    expect(PLATFORM).toMatch(/español rioplatense, con voseo/);
+    expect(PLATFORM).not.toMatch(/português do Brasil/);
   });
 });
