@@ -86,18 +86,22 @@ describe("POST /api/v1/products — a moeda vem da organização", () => {
    * guarda, uma chamada direta à API grava um produto em USD num catálogo que
    * a organização declarou em BRL — e o agente cota esse número ao cliente.
    */
-  it("ignora a moeda que vem no corpo", async () => {
-    vi.mocked(createClient).mockResolvedValue(supabaseCom("BRL") as never);
+  // Fork AutoVenta: a moeda passa a ser da UNIDADE (ARS ou USD), porque uma
+  // concessionária publica o 0 km em pesos e o usado em dólares. O corpo decide
+  // só entre essas duas; qualquer outra moeda é recusada, e o escopo continua
+  // vindo de fonte confiável.
+  it("fork AutoVenta: aceita a moeda da unidade quando é ARS ou USD", async () => {
+    vi.mocked(createClient).mockResolvedValue(supabaseCom("ARS") as never);
     const { POST } = await import("./route");
 
     const resposta = await POST(pedido({ ...PRODUTO, moeda: "USD" }));
 
     expect(resposta.status).toBe(201);
-    expect(inserido).toMatchObject({ moeda: "BRL" });
-    // O scope também vem de fonte confiável, nunca do body — o mock não pode
-    // só provar "moeda ignorada" enquanto deixa passar um `organization_id`
-    // vazado, que é a MESMA classe de bug (CLAUDE.md, multi-tenancy).
-    expect(orgIdLido).toBe(ORG_ID);
+    expect(inserido).toMatchObject({ moeda: "USD" });
+    // O scope continua vindo de fonte confiável, nunca do body (CLAUDE.md,
+    // multi-tenancy): com a moeda no corpo a rota não lê a organização, então a
+    // prova é o `organization_id` gravado.
+    expect(inserido).toMatchObject({ organization_id: ORG_ID });
   });
 
   /**
@@ -105,11 +109,21 @@ describe("POST /api/v1/products — a moeda vem da organização", () => {
    * chumbada em 'BRL' — que é exatamente o defeito que este PR conserta. Só a
    * organização em MXN prova que a rota foi LER a coluna.
    */
-  it("grava a moeda que a organização declarou, não o padrão", async () => {
+  it("fork AutoVenta: recusa moeda fora de ARS e USD", async () => {
+    vi.mocked(createClient).mockResolvedValue(supabaseCom("ARS") as never);
+    const { POST } = await import("./route");
+
+    const resposta = await POST(pedido({ ...PRODUTO, moeda: "EUR" }));
+
+    expect(resposta.status).toBe(422);
+    expect(inserido).toBeNull();
+  });
+
+  it("sem moeda no corpo, grava a moeda que a organização declarou, não o padrão", async () => {
     vi.mocked(createClient).mockResolvedValue(supabaseCom("MXN") as never);
     const { POST } = await import("./route");
 
-    const resposta = await POST(pedido({ ...PRODUTO, moeda: "USD" }));
+    const resposta = await POST(pedido(PRODUTO));
 
     expect(resposta.status).toBe(201);
     expect(inserido).toMatchObject({ moeda: "MXN" });
@@ -127,7 +141,7 @@ describe("POST /api/v1/products — a moeda vem da organização", () => {
     vi.mocked(createClient).mockResolvedValue(supabaseCom(null) as never);
     const { POST } = await import("./route");
 
-    const resposta = await POST(pedido({ ...PRODUTO, moeda: "USD" }));
+    const resposta = await POST(pedido(PRODUTO));
 
     expect(resposta.status).toBe(201);
     expect(inserido).toMatchObject({ moeda: "BRL" });

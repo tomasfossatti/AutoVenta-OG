@@ -45,6 +45,7 @@ import { resolveAuthDual, tetoDeEscritaDoToken } from "@/lib/api/auth-dual";
 import { comIdDaRequisicao, fail, ok } from "@/lib/api/wrappers";
 import { lerCorpoComTeto } from "@/lib/api/corpo-com-teto";
 import { moedaDaOrganizacao } from "@/lib/catalogo/moeda-da-org";
+import { guardarFicha } from "@/lib/catalogo/vehiculo";
 import { chaveDoCodigo, lerPlanilha, type ErroDaLinha } from "@/lib/catalogo/planilha";
 import { guardarFotosPorUrl } from "@/lib/catalogo/fotos-por-url";
 import { apagarDoBucket } from "@/lib/catalogo/fotos-no-bucket";
@@ -446,6 +447,33 @@ export async function POST(req: NextRequest): Promise<Response> {
     else descricoes += 1;
   }
 
+  // Fork AutoVenta: a moeda da unidade e a ficha do veículo, num passo à parte e
+  // só de quem REALMENTE entrou, como a descrição. A moeda escrita na planilha
+  // vale também para o produto que já existia: a coluna é a decisão explícita
+  // de quem cadastra, e o cuidado do upsert acima é com a moeda da ORGANIZAÇÃO.
+  let fichas = 0;
+  const comFichaOuMoeda = preparadas.filter((p) => (p.vehiculo || p.moeda) && gravadosPorCodigo.has(p.codigo));
+  for (const p of comFichaOuMoeda) {
+    const { data: gravado, error: erroDaLeitura } = await supabase
+      .from("catalog_products")
+      .update({
+        ...(p.moeda ? { moeda: p.moeda } : {}),
+        ...(p.vehiculo ? { controla_estoque: false } : {}),
+      })
+      .eq("organization_id", orgId)
+      .eq("codigo", p.codigo)
+      .select("id")
+      .maybeSingle();
+    if (erroDaLeitura || !gravado) {
+      erros.push({ linha: p.linha, motivo: `"${p.nome}": ${erroDaLeitura?.message ?? t("Produto não encontrado.")}` });
+      continue;
+    }
+    if (!p.vehiculo) continue;
+    const ficha = await guardarFicha(supabase, orgId, (gravado as { id: string }).id, p.vehiculo);
+    if (!ficha.ok) erros.push({ linha: p.linha, motivo: `"${p.nome}": ${ficha.mensagem}` });
+    else fichas += 1;
+  }
+
   const existentes = paraGravar.filter((p) => antigos.has(p.codigo));
   // Linha recusada pelo banco não conta como atualizada nem desconta um novo
   // que entrou. O mesmo conjunto já governa a descrição e a troca das fotos.
@@ -466,6 +494,7 @@ export async function POST(req: NextRequest): Promise<Response> {
       criados,
       atualizados,
       descricoes,
+      fichas,
       erros: erros.length,
     },
   });
@@ -508,10 +537,13 @@ export async function GET(req: NextRequest): Promise<Response> {
   const teto = await tetoDeEscritaDoToken(authz, "products.import", requestId);
   if (teto) return teto;
 
+  // Fork AutoVenta: o modelo é a planilha de stock de uma concessionária, com as
+  // colunas da ficha do veículo e a moeda de cada unidade.
   const modelo = [
-    "codigo,nome,marca,categoria,preco,custo,estoque,descricao,foto",
-    'IP15-128,iPhone 15 128GB,Apple,Celular,5499.00,4100.00,3,"Tela de 6,1 polegadas, 128 GB",',
-    "PERF-212,212 VIP Men 100ml,Carolina Herrera,Perfume,449.90,280.00,7,,",
+    "codigo,nombre,marca,modelo,version,año,km,combustible,transmision,color,condicion,estado,precio,moneda,descripcion,foto",
+    'HILUX-21,Toyota Hilux SRV 2021,Toyota,Hilux,SRV,2021,85000,Diésel,Automática,Blanco,Usado,Disponible,38500000,ARS,"Único dueño, service oficial",',
+    "AMAROK-20,Volkswagen Amarok Highline 2020,Volkswagen,Amarok,Highline,2020,60000,Diésel,Automática,Gris,Usado,Reservado,28500,USD,,",
+    "CRONOS-24,Fiat Cronos Drive 2024,Fiat,Cronos,Drive,2024,0,Nafta,Manual,Rojo,0km,Disponible,21000000,ARS,,",
   ].join("\n");
 
   return comIdDaRequisicao(new Response(`﻿${modelo}\n`, {

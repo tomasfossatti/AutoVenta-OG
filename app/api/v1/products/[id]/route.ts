@@ -16,6 +16,7 @@ import { fail, ok } from "@/lib/api/wrappers";
 import { removeCatalogPresentationAudio } from "@/lib/catalogo/apresentacao-no-bucket";
 import { apagarDoBucket } from "@/lib/catalogo/fotos-no-bucket";
 import { guardarFotosPorUrl } from "@/lib/catalogo/fotos-por-url";
+import { guardarFicha } from "@/lib/catalogo/vehiculo";
 import { MODULO_SERVICOS, sinaisFixosQueTravamPreco } from "@/lib/catalogo/servicos-supabase";
 import { moduloLigado } from "@/lib/instalacao/modulos";
 import { capacidadesDaOrganizacao } from "@/lib/organizacao/capacidades";
@@ -60,7 +61,9 @@ export async function PATCH(
 
   // `fotos` é URL de ENTRADA, não coluna: sai do corpo antes do update, igual ao
   // POST. O que entra na coluna são os caminhos dos arquivos baixados.
-  const { fotos, ...campos } = parsed.data;
+  // Fork AutoVenta: `vehiculo` vai para a tabela da ficha; `moeda` (ARS ou USD)
+  // é coluna de `catalog_products` e segue em `campos`.
+  const { fotos, vehiculo, ...campos } = parsed.data;
 
   const supabase = authz.supabase;
   if (
@@ -130,7 +133,12 @@ export async function PATCH(
 
   const { data, error } = await supabase
     .from("catalog_products")
-    .update({ ...campos, ...(caminhos ? { fotos: caminhos } : {}) })
+    .update({
+      ...campos,
+      ...(caminhos ? { fotos: caminhos } : {}),
+      // Com ficha, quem diz se a unidade está à venda é o `estado`, não o estoque.
+      ...(vehiculo ? { controla_estoque: false } : {}),
+    })
     .eq("organization_id", authz.organizationId)
     .eq("id", id)
     .select(COLUNAS_DO_PRODUTO)
@@ -149,6 +157,18 @@ export async function PATCH(
   if (!data) {
     if (caminhos?.length) await apagarDoBucket(authz.organizationId, id, caminhos, requestId);
     return fail("not_found", t("Produto não encontrado."), 404, { requestId });
+  }
+
+  if (vehiculo) {
+    const ficha = await guardarFicha(supabase, authz.organizationId, id, vehiculo);
+    if (!ficha.ok) {
+      return fail(
+        "internal_error",
+        t("O produto foi salvo, mas a ficha do veículo não. Edite o produto para tentar de novo."),
+        500,
+        { requestId },
+      );
+    }
   }
 
   // A foto que a lista nova não trouxe sai do bucket — a mesma limpeza que a

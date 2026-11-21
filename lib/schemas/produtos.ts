@@ -1,3 +1,4 @@
+import { fichaDelVehiculoSchema, MONEDAS_DEL_VEHICULO, type FichaGuardada } from "@/lib/catalogo/vehiculo";
 import { z } from "zod";
 
 import { MAXIMO_DE_FOTOS } from "@/lib/catalogo/fotos";
@@ -173,6 +174,19 @@ export const produtoCreateSchema = z.object({
   imagem_url: z.string().trim().url().max(2000).optional(),
   /** As URLs das fotos, na ordem da capa (ver `fotos` acima). */
   fotos: fotos.optional(),
+  /**
+   * Fork AutoVenta: a ficha do veículo (`lib/catalogo/vehiculo.ts`), gravada em
+   * `catalog_vehicle_details`. Ausente = produto sem ficha, como no upstream.
+   */
+  vehiculo: fichaDelVehiculoSchema.optional(),
+  /**
+   * Fork AutoVenta: a moeda da UNIDADE. Uma concessionária publica o 0 km em
+   * pesos e o usado em dólares, então aqui a moeda deixa de ser só a da
+   * organização (ver o comentário de `moeda` acima, que segue valendo para
+   * quem não manda o campo). Só as duas moedas em que se vende carro na
+   * Argentina.
+   */
+  moeda: z.enum(MONEDAS_DEL_VEHICULO).optional(),
 });
 
 /**
@@ -211,6 +225,8 @@ export interface Produto {
   /** Caminhos em `catalog-photos`, na ordem da tela (migration 0390). */
   fotos: string[];
   updated_at: string;
+  /** Fork AutoVenta: a ficha do veículo, quando a tela a carregou. */
+  vehiculo?: FichaGuardada | null;
 }
 
 /** As colunas que a tela e a rota leem — uma lista, não duas. */

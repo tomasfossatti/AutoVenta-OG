@@ -27,6 +27,7 @@ import {
   PRODUTOS_POR_PAGINA,
 } from "@/lib/catalogo/busca-da-tela";
 import { moedaDaOrganizacao } from "@/lib/catalogo/moeda-da-org";
+import { guardarFicha } from "@/lib/catalogo/vehiculo";
 import { guardarFotosPorUrl } from "@/lib/catalogo/fotos-por-url";
 import { apagarDoBucket } from "@/lib/catalogo/fotos-no-bucket";
 import { capacidadesDaOrganizacao } from "@/lib/organizacao/capacidades";
@@ -145,12 +146,16 @@ export async function POST(req: NextRequest): Promise<Response> {
   }
 
   // A moeda vem da organização, nunca do corpo — ver `moedaDaOrganizacao()`.
-  const moeda = await moedaDaOrganizacao(supabase, authz.organizationId);
+  // Fork AutoVenta: a unidade pode vir em ARS ou USD; sem o campo, vale a moeda
+  // da organização, como no upstream.
+  const moeda = parsed.data.moeda ?? (await moedaDaOrganizacao(supabase, authz.organizationId));
 
   // `fotos` é URL de ENTRADA e NÃO é coluna: sai do corpo antes do insert, como
   // a moeda sai antes de qualquer decisão. Ver o comentário do campo em
   // `lib/schemas/produtos.ts`.
-  const { fotos, ...campos } = parsed.data;
+  // Fork AutoVenta: `vehiculo` vai para a tabela da ficha, e `moeda` já foi lida acima.
+  const { fotos, vehiculo, moeda: _moedaDoCorpo, ...campos } = parsed.data;
+  void _moedaDoCorpo;
   const urls = fotos ?? [];
 
   /**
@@ -186,6 +191,9 @@ export async function POST(req: NextRequest): Promise<Response> {
     .from("catalog_products")
     .insert({
       ...campos,
+      // Com ficha, quem diz se a unidade está à venda é o `estado` dela, não a
+      // contagem de estoque.
+      ...(vehiculo ? { controla_estoque: false } : {}),
       ...(produtoId ? { id: produtoId } : {}),
       ...(caminhos ? { fotos: caminhos } : {}),
       moeda,
@@ -207,6 +215,23 @@ export async function POST(req: NextRequest): Promise<Response> {
       return fail("conflict", t("Já existe um produto com esse código."), 409, { requestId });
     }
     return fail("internal_error", "Erro ao salvar o produto.", 500, { requestId });
+  }
+
+  if (vehiculo) {
+    const ficha = await guardarFicha(
+      supabase,
+      authz.organizationId,
+      (data as unknown as { id: string }).id,
+      vehiculo,
+    );
+    if (!ficha.ok) {
+      return fail(
+        "internal_error",
+        t("O produto foi salvo, mas a ficha do veículo não. Edite o produto para tentar de novo."),
+        500,
+        { requestId },
+      );
+    }
   }
 
   await audit({

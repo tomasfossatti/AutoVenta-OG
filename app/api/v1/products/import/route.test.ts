@@ -670,18 +670,24 @@ describe("POST /api/v1/products/import — foto por URL", () => {
 
     const texto = (await (await GET(new NextRequest("http://localhost/api/v1/products/import"))).text()).replace("\ufeff", "");
 
-    expect(texto.split("\n")[0]).toBe("codigo,nome,marca,categoria,preco,custo,estoque,descricao,foto");
+    // Fork AutoVenta: o modelo é a planilha de stock de uma concessionária.
+    expect(texto.split("\n")[0]).toBe(
+      "codigo,nombre,marca,modelo,version,año,km,combustible,transmision,color,condicion,estado,precio,moneda,descripcion,foto",
+    );
     const lido = lerPlanilha(texto);
     if ("erro" in lido) throw new Error(`o modelo devolvido não é lido pelo importador: ${lido.erro}`);
     // As linhas do modelo trazem a coluna VAZIA: importado como vem, o modelo
     // não baixa nada de ninguém e nenhuma linha volta recusada.
-    expect(lido.produtos).toHaveLength(2);
+    expect(lido.erros).toEqual([]);
+    expect(lido.colunasIgnoradas).toEqual([]);
+    expect(lido.produtos).toHaveLength(3);
     for (const produto of lido.produtos) expect(produto).not.toHaveProperty("fotos");
     expect(texto).not.toMatch(/https?:\/\//);
     // A coluna de descrição do modelo é DESCRIÇÃO, não um segundo nome.
-    expect(lido.produtos.map((p) => [p.nome, p.descricao])).toEqual([
-      ["iPhone 15 128GB", "Tela de 6,1 polegadas, 128 GB"],
-      ["212 VIP Men 100ml", undefined],
+    expect(lido.produtos.map((p) => [p.nome, p.descricao, p.moeda, p.vehiculo?.estado])).toEqual([
+      ["Toyota Hilux SRV 2021", "Único dueño, service oficial", "ARS", "disponible"],
+      ["Volkswagen Amarok Highline 2020", undefined, "USD", "reservado"],
+      ["Fiat Cronos Drive 2024", undefined, "ARS", "disponible"],
     ]);
   });
 });
