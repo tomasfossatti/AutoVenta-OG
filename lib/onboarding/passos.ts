@@ -85,7 +85,11 @@ export const PASSOS: readonly PassoDoOnboarding[] = [
     // pessoa acabou de confirmar funcionando, e é o mesmo cérebro que vai
     // atender. Pedir o quadro antes obrigaria a montá-lo no escuro.
     rotulo: "Onde ele organiza",
-    existe: () => true,
+    // Fork AutoVenta, etapa 1: o passo fica fora. Os quadros prontos e o
+    // pedido de sugestão à IA são de negócio brasileiro e em português
+    // (`pacotes-de-funil.ts`, `sugerir-funil.ts`), e o quadro de concessionária
+    // é a etapa seguinte do fork. Para voltar, basta devolver `() => true`.
+    existe: () => false,
     cumprido: (s) => marcado(s.funil),
     pulado: (s) => foiPulado(s.funil),
   },

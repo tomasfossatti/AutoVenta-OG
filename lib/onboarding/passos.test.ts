@@ -37,16 +37,30 @@ describe("passos visíveis", () => {
       "welcome",
       "connect-whatsapp",
       "setup-ai",
-      // O quadro de clientes vem DEPOIS de treinar: a sugestão sai da chave que
-      // a pessoa acabou de confirmar funcionando, e é o mesmo modelo que vai
-      // atender. Pedi-lo antes obrigaria a montá-lo no escuro.
-      "funil",
+      // Fork AutoVenta, etapa 1: o passo do quadro ("funil") está fora até
+      // existir o quadro de concessionária (ver `passos.ts`).
       // Ver o funcionário atender vem DEPOIS de treiná-lo e ANTES de chamar o
       // time: é a prova de que ele funciona, e ela precisa acontecer enquanto a
       // pessoa ainda está no wizard.
       "testar",
       "invite-team",
     ]);
+  });
+});
+
+describe("fork AutoVenta, etapa 1", () => {
+  it("o passo do quadro de clientes não aparece em nenhuma instalação", () => {
+    expect(passosVisiveis(SEM_LOJA).map((p) => p.segmento)).not.toContain("funil");
+    expect(passosVisiveis(COM_LOJA).map((p) => p.segmento)).not.toContain("funil");
+  });
+
+  it("depois de treinar, o próximo passo é ver ele atender", () => {
+    const s: OnboardingState = {
+      welcome: { accepted_at: "x", timezone: "America/Argentina/Buenos_Aires", display_name: "N" },
+      whatsapp: { status: "WORKING" },
+      ai: { agent_id: "a", prompt_template: "p" },
+    };
+    expect(proximoPasso(s, SEM_LOJA)?.segmento).toBe("testar");
   });
 });
 
