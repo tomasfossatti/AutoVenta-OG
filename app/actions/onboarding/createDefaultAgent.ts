@@ -10,8 +10,9 @@ import { z } from "zod";
 import { publishFirstVersion } from "@/lib/ai/agents/first-publication";
 import { audit } from "@/lib/audit";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { aiAgentDefaultSchema, type PromptTemplate } from "@/lib/schemas/onboarding";
+import { aiAgentDefaultSchema } from "@/lib/schemas/onboarding";
 import { publicarMemoriaDaOrg } from "@/lib/ai/memoria-da-org";
+import { promptDeConcesionaria } from "@/lib/onboarding/prompt-de-concesionaria";
 import {
   requireOnboardingCtx,
   patchOnboardingState,
@@ -22,30 +23,12 @@ import {
 /**
  * O jeito de falar do funcionário.
  *
- * Os corpos diziam "loja online" e "e-commerce" em dois dos três — num produto
- * que se declara multi-nicho por escrito, e cuja maioria de adopters roda em
- * clínica, imobiliária e infoproduto. Uma clínica terminava o onboarding com um
- * atendente que se apresentava como sendo de uma loja virtual.
- *
- * Recebem o nome do negócio E o ramo: um funcionário que sabe onde trabalha é o
- * mínimo que se espera de alguém contratado, e saber o QUE o lugar faz é a
- * diferença entre "Olá, como posso ajudar?" e uma primeira frase que já mostra
- * que ele entendeu onde está. O ramo é o que o dono respondeu no primeiro passo;
- * quem não respondeu recebe a versão sem ele, e não uma inventada.
+ * Fork AutoVenta: os três corpos genéricos (em português) deram lugar ao
+ * prompt de concessionária em espanhol rioplatense
+ * (`lib/onboarding/prompt-de-concesionaria.ts`). As três chaves de
+ * `PROMPT_TEMPLATES` seguem sendo os tons que a tela oferece, e o nome do
+ * negócio e o que ele faz entram já resolvidos no texto.
  */
-function ondeTrabalha(negocio: string, oQueFaz: string | undefined): string {
-  return oQueFaz ? `${negocio}, que é: ${oQueFaz}` : negocio;
-}
-
-const PROMPT_BODIES: Record<PromptTemplate, (onde: string) => string> = {
-  ecommerce_friendly: (n) =>
-    `Você atende os clientes de ${n}. Fale de forma calorosa e próxima, como alguém que gosta de ajudar. Cumprimente, entenda o que a pessoa precisa e ofereça opções claras. Confirme os detalhes antes de agir.`,
-  ecommerce_professional: (n) =>
-    `Você atende os clientes de ${n}. Fale de forma objetiva, cordial e profissional. Vá direto ao ponto, sem parecer frio, e sempre termine indicando o próximo passo.`,
-  support_minimal: (n) =>
-    `Você atende os clientes de ${n}. Responda em frases curtas, peça apenas o que for necessário e chame uma pessoa do time assim que a dúvida sair do seu alcance.`,
-};
-
 /** O agente padrão desta organização, do jeito que este passo precisa vê-lo. */
 interface AgenteDoOnboarding {
   id: string;
@@ -142,7 +125,11 @@ export async function createDefaultAgent(formData: FormData): Promise<CreateAgen
     oQueFaz = undefined;
   }
 
-  const systemPrompt = PROMPT_BODIES[input.prompt_template](ondeTrabalha(ctx.orgName, oQueFaz));
+  const systemPrompt = promptDeConcesionaria({
+    negocio: ctx.orgName,
+    queVende: oQueFaz,
+    tono: input.prompt_template,
+  });
 
   // O agente padrão do onboarding é UM por organização, e o banco já garante
   // isso: `ai_agents_one_default_per_org` é índice único parcial em
