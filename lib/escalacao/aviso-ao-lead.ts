@@ -174,29 +174,30 @@ const FECHOS = {
  * ali tem um robô. Medido numa loja em espanhol (26/09/2026): o cliente irritado
  * recebeu "Esse caso é melhor resolvido por uma pessoa…" no meio do pedido.
  *
- * Espanhol NEUTRO (tú, sem voseo): este texto serve a toda organização em `es`.
- * "Consulta", e não "pedido": numa loja, "pedido" é a compra.
+ * Fork AutoVenta: espanhol rioplatense, com voseo, porque as organizações
+ * do fork atendem na Argentina. "Consulta", e não "pedido": numa loja,
+ * "pedido" é a compra.
  */
 const ABERTURAS_ES: Record<MotivoDoAviso, readonly string[]> = {
   suspeita_de_opt_out: [
-    "Entendido. Dejo de enviarte mensajes automáticos por aquí.",
-    "Listo, anotado: no se envían más mensajes automáticos a este número.",
-    "¡Ok! Detengo ahora mismo los envíos automáticos de este canal.",
+    "Entendido. Dejo de mandarte mensajes automáticos por acá.",
+    "Listo, anotado: no se mandan más mensajes automáticos a este número.",
+    "¡Ok! Freno ahora mismo los envíos automáticos de este canal.",
   ],
   pediu_humano: [
-    "¡Claro! Ya estoy llamando a alguien del equipo para que siga contigo.",
-    "Sin problema: acabo de avisar a una persona del equipo para que continúe desde aquí.",
-    "Perfecto. Pasé tu conversación a una persona del equipo.",
+    "¡Claro! Ya le aviso a alguien del equipo para que siga con vos.",
+    "Sin problema: le acabo de avisar a una persona del equipo para que siga desde acá.",
+    "Perfecto. Le pasé tu conversación a una persona del equipo.",
   ],
   orcamento_de_ia: [
-    "Voy a pasar tu atención a una persona del equipo.",
-    "A partir de aquí te atiende alguien del equipo.",
-    "Estoy transfiriendo esta conversación a una persona del equipo.",
+    "Te paso con una persona del equipo.",
+    "A partir de acá te atiende alguien del equipo.",
+    "Le estoy pasando esta conversación a una persona del equipo.",
   ],
   outro: [
     "Esto lo resuelve mejor una persona del equipo. Ya les avisé.",
-    "Ya le pedí a alguien del equipo que lo vea contigo.",
-    "Voy a pedir ayuda a alguien del equipo para que lo vea contigo.",
+    "Ya le pedí a alguien del equipo que lo vea con vos.",
+    "Le voy a pedir a alguien del equipo que lo vea con vos.",
   ],
 };
 
@@ -204,17 +205,17 @@ const FECHOS_ES = {
   sem_equipe: [
     "Tu consulta quedó registrada y el equipo te responde lo antes posible.",
     "Dejé todo anotado; te respondemos apenas podamos.",
-    "Ya quedó registrado, y alguien te responde en la primera oportunidad.",
+    "Ya quedó registrado, y alguien te responde en cuanto pueda.",
   ],
   fora_de_expediente: [
     "En este momento no hay nadie disponible, pero tu consulta quedó registrada.",
     "Ahora no hay nadie libre; dejé tu consulta anotada para el equipo.",
-    "No hay una persona disponible en este instante: tu conversación quedó en la cola.",
+    "No hay una persona disponible en este momento, así que tu conversación quedó en la fila.",
   ],
   com_equipe: [
-    "Solo espera un momento aquí en la conversación.",
-    "Quédate por aquí, que ya te responden.",
-    "Espera un momento en esta conversación, por favor.",
+    "Esperá un momento acá en la conversación.",
+    "Quedate por acá, que ya te responden.",
+    "Esperá un momento en esta conversación, por favor.",
   ],
 } as const;
 

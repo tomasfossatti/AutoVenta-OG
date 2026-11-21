@@ -219,16 +219,27 @@ describe("o aviso sai no idioma da organização", () => {
     }
   });
 
+  it("fork AutoVenta: o espanhol é rioplatense, com voseo e sem tuteio", () => {
+    for (const motivo of MOTIVOS) {
+      for (const estado of ESTADOS) {
+        for (let i = 0; i < 30; i++) {
+          const t = textoDoAviso(motivo, estado.quem, randomUUID(), "es");
+          expect(t, `${motivo} / ${estado.rotulo}`).not.toMatch(/contigo|quédate|aquí|(?<!\p{L})espera(?!\p{L})/iu);
+        }
+      }
+    }
+  });
+
   it("o estado da equipe muda o fecho em espanhol como muda em português", () => {
-    expect(textoDoAviso("outro", { disponiveis: 0, total: 0 }, LEAD, "es")).toMatch(/registrad|anotado|primera oportunidad/i);
+    expect(textoDoAviso("outro", { disponiveis: 0, total: 0 }, LEAD, "es")).toMatch(/registrad|anotado/i);
     expect(textoDoAviso("outro", { disponiveis: 0, total: 3 }, LEAD, "es")).toMatch(/no hay/i);
-    expect(textoDoAviso("outro", { disponiveis: 2, total: 3 }, LEAD, "es")).toMatch(/espera|quédate/i);
+    expect(textoDoAviso("outro", { disponiveis: 2, total: 3 }, LEAD, "es")).toMatch(/esperá|quedate/i);
   });
 
   it("quem pediu para parar, em espanhol, não recebe convite para esperar", () => {
     for (const estado of ESTADOS) {
       const t = textoDoAviso("suspeita_de_opt_out", estado.quem, LEAD, "es");
-      expect(t, estado.rotulo).toMatch(/dejo de|no se envían|detengo/i);
+      expect(t, estado.rotulo).toMatch(/dejo de|no se mandan|freno/i);
       expect(t, estado.rotulo).not.toMatch(/espera|cola/i);
     }
   });
