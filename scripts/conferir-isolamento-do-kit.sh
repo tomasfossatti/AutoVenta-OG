@@ -74,6 +74,9 @@ if [ -z "$release" ] && [ -n "${GH_TOKEN:-}" ] && command -v gh >/dev/null 2>&1;
   release="$(cd "$ROOT" && gh release view --json tagName -q .tagName 2>/dev/null || true)"
   if [ -z "$release" ]; then
     pai="$(cd "$ROOT" && gh repo view --json parent -q '.parent | select(. != null) | .owner.login + "/" + .name' 2>/dev/null || true)"
+    # Fork copiado (no creado con el botón "Fork" de GitHub): no hay `parent`,
+    # así que el upstream se declara con CONFERENCIA_KIT_UPSTREAM=dueño/repo.
+    [ -z "$pai" ] && pai="${CONFERENCIA_KIT_UPSTREAM:-}"
     if [ -n "$pai" ]; then
       release="$(gh release view -R "$pai" --json tagName -q .tagName 2>/dev/null || true)"
       [ -n "$release" ] && origem_das_tags="https://github.com/$pai.git"

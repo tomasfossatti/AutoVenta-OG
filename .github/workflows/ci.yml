@@ -781,6 +781,9 @@ jobs:
         # consultas/hora por IP — o executor próprio é um IP só.
         env:
           GH_TOKEN: ${{ github.token }}
+          # AutoVenta-OG no es fork de GitHub: sin release propia, la conferencia
+          # usa la última release del upstream (ver conferir-isolamento-do-kit.sh).
+          CONFERENCIA_KIT_UPSTREAM: melgarafael/DeskcommCRM
         run: pnpm test:db
 
       # O `update.sh` do cliente roda sobre um banco COM DADOS, e nenhum gate
