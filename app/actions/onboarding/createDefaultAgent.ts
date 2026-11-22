@@ -118,9 +118,11 @@ export async function createDefaultAgent(formData: FormData): Promise<CreateAgen
   // passo: o funcionário nasce sem essa frase, que é degradação honesta — o
   // contrário seria travar a contratação por causa de um adjetivo.
   let oQueFaz: string | undefined;
+  let provincia: string | undefined;
   try {
     const { state } = await loadOnboardingState(ctx.orgId);
     oQueFaz = state.welcome?.o_que_faz;
+    provincia = state.welcome?.provincia;
   } catch {
     oQueFaz = undefined;
   }
@@ -128,6 +130,7 @@ export async function createDefaultAgent(formData: FormData): Promise<CreateAgen
   const systemPrompt = promptDeConcesionaria({
     negocio: ctx.orgName,
     queVende: oQueFaz,
+    provincia,
     tono: input.prompt_template,
   });
 

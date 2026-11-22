@@ -10532,6 +10532,18 @@ export const DICIONARIO: Traducoes = {
   "Decide o horário em que seu funcionário pode falar com clientes.": {
     es: "Decide el horario en el que tu empleado puede hablar con los clientes.",
   },
+  // Fork AutoVenta: o primeiro passo de uma concessionária (`lib/onboarding/datos-de-concesionaria.ts`).
+  "O que a agência vende?": { es: "¿Qué vende la agencia?" },
+  "0km": { es: "0km" },
+  "Usados": { es: "Usados" },
+  "0km e usados": { es: "0km y usados" },
+  "Com isso seu funcionário sabe que carros a agência oferece.": {
+    es: "Con esto tu empleado sabe qué autos ofrece la agencia.",
+  },
+  "Em que província fica a agência?": { es: "¿En qué provincia está la agencia?" },
+  "Seu funcionário a menciona ao se apresentar. O horário de atendimento é o da Argentina.": {
+    es: "Tu empleado la menciona al presentarse. El horario de atención es el de la Argentina.",
+  },
   "Li e aceito os": { es: "Leí y acepto los" },
   "Termos de Uso": { es: "Términos de Uso" },
   "e a": { es: "y la" },

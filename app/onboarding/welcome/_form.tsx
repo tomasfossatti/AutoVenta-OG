@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { useT } from "@/hooks/i18n/useT";
 
@@ -15,32 +15,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { FUSOS_DO_ONBOARDING } from "@/lib/tempo/fusos";
-import { fusoDoNavegador } from "@/lib/tempo/fuso-do-navegador";
+import {
+  FUSO_DA_ARGENTINA,
+  PROVINCIAS_ARGENTINAS,
+  PROVINCIA_PADRAO,
+  RUBROS_DE_CONCESIONARIA,
+} from "@/lib/onboarding/datos-de-concesionaria";
 
 export function WelcomeForm({ defaultOrgName, orgId }: { defaultOrgName: string; orgId: string }) {
   const t = useT();
   const [displayName, setDisplayName] = useState(defaultOrgName);
   const [oQueFaz, setOQueFaz] = useState("");
-  // Fork AutoVenta: as concessionárias são de Neuquén. Sem fuso oferecido vindo
-  // do navegador (Neuquén costuma reportar `America/Argentina/Salta`, que não
-  // está na lista), o passo marca Buenos Aires em vez de São Paulo. O horário é
-  // o mesmo (UTC-3); muda o que a pessoa lê.
-  const [timezone, setTimezone] = useState("America/Argentina/Buenos_Aires");
-
-  // O fuso do NAVEGADOR (se for um oferecido) vem marcado no lugar de São
-  // Paulo: é o mesmo com que a empresa nasceu (`lib/auth/perfil-da-empresa-nova.ts`),
-  // e este passo regrava o fuso da empresa com o que estiver marcado. Num
-  // efeito, e não no estado inicial, porque o servidor não sabe o fuso do
-  // navegador — e a hidratação divergiria.
-  useEffect(() => {
-    const doNavegador = fusoDoNavegador();
-    // Uma leitura só, depois da hidratação, de um valor que só o navegador
-    // tem: não há prop nem estado anterior de onde derivar no render.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (doNavegador && FUSOS_DO_ONBOARDING.some((f) => f.id === doNavegador))
-      setTimezone(doNavegador);
-  }, []);
+  // Fork AutoVenta: a província da agência, com Neuquén marcada. Ela não muda o
+  // fuso — a Argentina inteira é UTC-3 — e entra no prompt do agente
+  // (`lib/onboarding/datos-de-concesionaria.ts`).
+  const [provincia, setProvincia] = useState<string>(PROVINCIA_PADRAO);
   const [accepted, setAccepted] = useState(false);
   const [pending, startTransition] = useTransition();
 
@@ -83,50 +72,54 @@ export function WelcomeForm({ defaultOrgName, orgId }: { defaultOrgName: string;
       </div>
 
       {/*
-        A pergunta que faltava no produto inteiro. Sem ela, o funcionário nasce
-        se apresentando como atendente de uma "loja online" — era o que os três
-        modelos de prompt diziam — e o quadro de clientes nasce com as colunas
-        de e-commerce que o gatilho semeia. Os dois defeitos têm a mesma origem:
-        uma instalação que nunca pergunta em que ramo entrou.
+        A pergunta que faltava no produto inteiro, fechada para o fork: uma
+        concessionária vende 0km, usados ou os dois. Cada opção grava a frase que
+        o prompt do agente usa ("La agencia se dedica a la venta de autos 0km").
       */}
-      <div className="space-y-2">
-        <Label htmlFor="o_que_faz">{t("O que vocês fazem?")}</Label>
-        <Input
-          id="o_que_faz"
-          name="o_que_faz"
-          value={oQueFaz}
-          onChange={(e) => setOQueFaz(e.target.value)}
-          maxLength={280}
-          placeholder={t("Ex.: clínica odontológica, ou venda de roupa fitness pelo WhatsApp")}
-        />
+      <fieldset className="space-y-2">
+        <legend className="text-sm font-medium leading-none">{t("O que a agência vende?")}</legend>
+        <div className="flex flex-wrap gap-x-6 gap-y-2 pt-1">
+          {RUBROS_DE_CONCESIONARIA.map((r) => (
+            <label key={r.id} className="flex items-center gap-2 text-sm">
+              <input
+                type="radio"
+                name="o_que_faz"
+                value={r.frase}
+                checked={oQueFaz === r.frase}
+                onChange={() => setOQueFaz(r.frase)}
+                required
+              />
+              {t(r.rotulo)}
+            </label>
+          ))}
+        </div>
         <p className="text-xs text-muted-foreground">
-          {t(
-            "Uma linha basta. É com isso que seu funcionário aprende com quem ele está falando — e que a gente monta o quadro de clientes do seu jeito.",
-          )}
+          {t("Com isso seu funcionário sabe que carros a agência oferece.")}
         </p>
-      </div>
+      </fieldset>
 
       <div className="space-y-2">
-        <Label htmlFor="timezone">{t("Onde você atende")}</Label>
-        <Select value={timezone} onValueChange={setTimezone}>
-          <SelectTrigger id="timezone">
+        <Label htmlFor="provincia">{t("Em que província fica a agência?")}</Label>
+        <Select value={provincia} onValueChange={setProvincia}>
+          <SelectTrigger id="provincia">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {FUSOS_DO_ONBOARDING.map((f) => (
-              <SelectItem key={f.id} value={f.id}>
-                {t(f.cidade)}
+            {PROVINCIAS_ARGENTINAS.map((p) => (
+              <SelectItem key={p} value={p}>
+                {p}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
-        <input type="hidden" name="timezone" value={timezone} />
+        <input type="hidden" name="provincia" value={provincia} />
+        <input type="hidden" name="timezone" value={FUSO_DA_ARGENTINA} />
         {/* A org para a qual ESTA aba foi aberta. No submit, o server action
             resolve por ela (validada como membership), não pela org ativa do
             momento — que outra aba pode ter trocado. */}
         <input type="hidden" name="organization_id" value={orgId} />
         <p className="text-xs text-muted-foreground">
-          {t("Decide o horário em que seu funcionário pode falar com clientes.")}
+          {t("Seu funcionário a menciona ao se apresentar. O horário de atendimento é o da Argentina.")}
         </p>
       </div>
 

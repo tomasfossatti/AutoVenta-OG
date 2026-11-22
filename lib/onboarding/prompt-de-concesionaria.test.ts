@@ -23,6 +23,16 @@ describe("o prompt de concessionária (fork AutoVenta, etapa 1)", () => {
     expect(prompt).not.toContain("se dedica a");
   });
 
+  it("a província do primeiro passo entra no lugar de Neuquén", () => {
+    const prompt = promptDeConcesionaria({ ...base, provincia: "Córdoba", queVende: "la venta de autos 0km" });
+    expect(prompt).toContain("Autos del Valle, una agencia de autos de Córdoba. La agencia se dedica a la venta de autos 0km.");
+    expect(prompt).not.toContain("{{provincia}}");
+  });
+
+  it("província em branco cai em Neuquén", () => {
+    expect(promptDeConcesionaria({ ...base, provincia: "  " })).toContain("una agencia de autos de Neuquén.");
+  });
+
   it("nome com `$` não vira padrão de substituição", () => {
     expect(promptDeConcesionaria({ ...base, negocio: "Autos $& Co" })).toContain("Autos $& Co, una agencia");
   });

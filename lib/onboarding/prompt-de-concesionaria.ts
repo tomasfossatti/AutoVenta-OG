@@ -4,7 +4,8 @@
  * Substitui os três corpos genéricos do onboarding (`createDefaultAgent.ts`),
  * que estavam em português e falavam de "clientes" de qualquer ramo. O texto
  * é o que o agente lê como camada da organização: espanhol rioplatense, com
- * voseo, para uma agência de carros de Neuquén.
+ * voseo, para uma agência de carros da província escolhida no primeiro passo
+ * (Neuquén, se nenhuma foi gravada).
  *
  * ─── O que ele usa e o que ele NÃO promete ────────────────────────────────
  *
@@ -37,10 +38,12 @@
  * ─── As variáveis ──────────────────────────────────────────────────────────
  *
  * Resolvidas aqui, na criação do agente, com o que o onboarding já recolhe:
- * o nome do negócio (`display_name`), o que ele faz (`o_que_faz`, opcional) e
+ * o nome do negócio (`display_name`), o que ele faz (`o_que_faz`, opcional), a
+ * província (`provincia`, opcional; `PROVINCIA_PADRAO` quando falta) e
  * o tom escolhido. Nenhum `{{…}}` chega ao prompt gravado.
  */
 import type { PromptTemplate } from "@/lib/schemas/onboarding";
+import { PROVINCIA_PADRAO } from "./datos-de-concesionaria";
 
 /** Os três tons do onboarding — as mesmas chaves de `PROMPT_TEMPLATES`. */
 export const TONOS_DE_CONCESIONARIA: Record<PromptTemplate, string> = {
@@ -52,7 +55,7 @@ export const TONOS_DE_CONCESIONARIA: Record<PromptTemplate, string> = {
 
 const PLANTILLA = [
   "## Quién sos",
-  "Atendés por WhatsApp a las personas que le escriben a {{nombre_concesionaria}}, una agencia de autos de Neuquén.{{frase_que_vende}}",
+  "Atendés por WhatsApp a las personas que le escriben a {{nombre_concesionaria}}, una agencia de autos de {{provincia}}.{{frase_que_vende}}",
   "Tu trabajo es responder la consulta, contar lo que figura en el stock de la agencia, entender qué auto busca la persona y pasarle la conversación a un vendedor con los datos ordenados. No cerrás ventas, no tasás usados y no aprobás créditos, porque de eso se ocupa el equipo.",
   "",
   "## Cómo hablás",
@@ -174,6 +177,8 @@ export interface DatosDelPrompt {
   negocio: string;
   /** O que o negócio faz, na palavra do dono (`o_que_faz`). Opcional. */
   queVende?: string;
+  /** A província da agência (`provincia` do primeiro passo). Opcional. */
+  provincia?: string;
   tono: PromptTemplate;
 }
 
@@ -191,9 +196,11 @@ function fraseDoQueVende(queVende: string | undefined): string {
  * `replace` com string: o nome do negócio é texto livre, e `$&` dentro dele
  * viraria padrão de substituição.
  */
-export function promptDeConcesionaria({ negocio, queVende, tono }: DatosDelPrompt): string {
+export function promptDeConcesionaria({ negocio, queVende, provincia, tono }: DatosDelPrompt): string {
   return PLANTILLA.split("{{nombre_concesionaria}}")
     .join(negocio.trim())
+    .split("{{provincia}}")
+    .join((provincia ?? "").trim() || PROVINCIA_PADRAO)
     .split("{{frase_que_vende}}")
     .join(fraseDoQueVende(queVende))
     .split("{{tono}}")
