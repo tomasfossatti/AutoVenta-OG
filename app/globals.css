@@ -34,7 +34,7 @@
   /* Surfaces (light) */
   --color-bg: #f7f7f7;
   --color-surface: #ffffff;
-  --color-surface-elevated: #efefef;
+  --color-surface-elevated: #f3f3f3;
   --color-overlay: rgba(0, 0, 0, 0.42);
 
   /* Text (light) */
@@ -283,7 +283,7 @@
 [data-theme="light"] {
   --color-bg: #f7f7f7;
   --color-surface: #ffffff;
-  --color-surface-elevated: #efefef;
+  --color-surface-elevated: #f3f3f3;
   --color-overlay: rgba(0, 0, 0, 0.42);
   --color-text: #000000;
   --color-text-muted: #4d4d4d;

@@ -123,10 +123,10 @@ describe("extrairRegua — os pares saem do globals.css, nunca de lista à mão"
       pares.find((p) => p.papel === papel && p.superficie === superficie)?.razao ?? 0;
 
     // Fork AutoVenta: medidos com a paleta celeste (`#3874f9` sobre `#f7f7f7` e
-    // `#efefef`). Accent e anel são o mesmo grau (600), daí o mesmo número.
+    // `#f3f3f3`). Accent e anel são o mesmo grau (600), daí o mesmo número.
     expect(razao("--color-accent", "--color-bg")).toBeCloseTo(3.89, 2);
     expect(razao(":focus-visible/outline", "--color-bg")).toBeCloseTo(3.89, 2);
-    expect(razao(":focus-visible/outline", "--color-surface-elevated")).toBeCloseTo(3.63, 2);
+    expect(razao(":focus-visible/outline", "--color-surface-elevated")).toBeCloseTo(3.76, 2);
   });
 
   it("a Sage inteira, como está no CSS, cabe nos pisos", () => {

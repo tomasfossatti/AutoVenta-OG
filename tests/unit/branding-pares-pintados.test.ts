@@ -347,9 +347,9 @@ describe("controle positivo — o produto sem marca não pode se mexer", () => {
     expect(cor.derivada?.escuro.deslocamento).toBe(0);
 
     const p = pintadosDaSemente("#3874f9");
-    // Claro: o anel é `accent-600` sobre `#f7f7f7` e `#efefef`.
+    // Claro: o anel é `accent-600` sobre `#f7f7f7` e `#f3f3f3`.
     expect(foco(p.claro, "--color-bg")).toBeCloseTo(3.89, 2);
-    expect(foco(p.claro, "--color-surface-elevated")).toBeCloseTo(3.63, 2);
+    expect(foco(p.claro, "--color-surface-elevated")).toBeCloseTo(3.76, 2);
     // Escuro: o anel é `accent-400`; quem aperta é o `-soft` COMPOSTO.
     expect(foco(p.escuro, "--color-bg")).toBeCloseTo(7.6, 2);
     expect(foco(p.escuro, "--color-surface-elevated")).toBeCloseTo(6.3, 2);
@@ -373,7 +373,7 @@ describe("a navy #0f172a — o defeito que a prova em tela achou", () => {
     const p = pintadosDaSemente("#0f172a");
     // Fork AutoVenta: no claro o anel é `accent-600` (era 500) sobre `#f7f7f7`.
     expect(foco(p.claro, "--color-bg")).toBeCloseTo(16.66, 2);
-    expect(foco(p.claro, "--color-surface-elevated")).toBeCloseTo(15.53, 2);
+    expect(foco(p.claro, "--color-surface-elevated")).toBeCloseTo(16.09, 2);
     expect(foco(p.escuro, "--color-bg")).toBeCloseTo(5.28, 2);
     expect(foco(p.escuro, "--color-surface-elevated")).toBeCloseTo(4.39, 2);
     for (const superficie of ["--color-bg", "--color-surface-elevated"] as const) {

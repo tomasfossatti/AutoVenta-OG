@@ -50,7 +50,7 @@ export const REGUA_DO_PRODUTO: Regua = {
       },
       {
         chave: "--color-surface-elevated",
-        hex: "#efefef",
+        hex: "#f3f3f3",
       },
     ],
     tingidas: [
