@@ -4517,3 +4517,21 @@ fazendo o papel do aplicativo com um receptor HTTP de verdade no `redirect_uri`;
 Banco (PKCE no SQL, reuso revoga, ainda-admin, isolamento): `tests/invariants/mcp-oauth-servidor.test.ts`.
 **Não medido aqui:** o ChatGPT de verdade — só existe contra um endereço público com HTTPS.
 Evidência: `evidence/mcp-oauth-chatgpt/01-consentimento.png`, `evidence/mcp-oauth-chatgpt/02-volta-ao-aplicativo.png`, `evidence/mcp-oauth-chatgpt/03-conexao-em-api-tokens.png`, `evidence/mcp-oauth-chatgpt/04-conexao-revogada.png`, `evidence/mcp-oauth-chatgpt/05-consentimento-somente-ler.png`, `evidence/mcp-oauth-chatgpt/06-redirect-nao-registrado.png`.
+
+## J-autoventa-2 — Embudo de concesionaria y ficha del vehículo, en español `[P1]` (2026-11-21)
+
+Fork AutoVenta, etapa 2. Migrations 9901 (embudo "Ventas"), 9902 (`catalog_vehicle_details`) y 9903
+(moneda ARS). Spec: `tests/e2e/autoventa-ficha-del-vehiculo.spec.ts` (parte 8), con el gerente de
+la cuenta de prueba, la interfaz en español, `next start` y el baseline fresco. Variables opcionales
+ausentes (sin WAHA, Redis, Resend ni claves de IA).
+
+| Caso | Qué prueba | Cómo |
+|---|---|---|
+| Embudo | la organización nace con "Ventas" predeterminado y sus 8 etapas en orden | E2E (pantalla) |
+| Alta manual | la Hilux usada, disponible, en pesos, con la ficha completa; la fila muestra el resumen y "$ 38.500.000,00" | E2E (pantalla) |
+| Planilla modelo | la Amarok reservada en dólares ("US$ 28.500,00") y el Cronos 0 km entran por la planilla que baja la misma pantalla | E2E (pantalla + archivo) |
+| Edición | pasar a "Señado" cambia el resumen de la fila | E2E (pantalla) |
+
+Banco (RLS entre agencias, solo el gerente cambia el estado, CHECK, cascada): `tests/invariants/autoventa-etapa-2.test.ts`.
+**No medido acá:** la respuesta del agente por WhatsApp real con el stock cargado.
+Evidencia: `evidence/autoventa-etapa-2/00-lista-de-embudos.png`, `evidence/autoventa-etapa-2/01-embudo-ventas.png`, `evidence/autoventa-etapa-2/02-alta-con-ficha.png`, `evidence/autoventa-etapa-2/03-unidad-en-el-stock.png`, `evidence/autoventa-etapa-2/04-planilla-importada.png`, `evidence/autoventa-etapa-2/05-edicion-senado.png`, `evidence/autoventa-etapa-2/06-unidad-senada.png`.

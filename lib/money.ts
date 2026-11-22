@@ -226,6 +226,10 @@ const LOCALE_DA_MOEDA_SEM_PAIS: Readonly<Record<string, string>> = {
   // caía em `en-US` — `PYG 125,000`, com vírgula de milhar. `es-PY` escreve
   // `Gs. 125.000`, como se lê no Paraguai. Medido no ICU do Node 22.
   PYG: "es-PY",
+  // Fork AutoVenta: na Argentina o peso também se escreve `$`, então o dólar
+  // precisa do `US$` para não ser lido como peso. `es-US` maximizado daria
+  // `$28,500.00`; `es-AR` escreve `US$ 28.500,00`, como se lê num aviso de carro.
+  USD: "es-AR",
 };
 
 function localeDaMoeda(moeda: string): string {
@@ -497,7 +501,9 @@ export function formatSomaPorMoeda(
  * `LOCALE_DA_MOEDA_SEM_PAIS`): sem a exceção, `formatCents(24990, "EUR")`
  * sairia `€249.90`, e a varredura de degradação deixaria passar.
  */
-export const MOEDAS_SERVIDAS = ["AOA", "BRL", "EUR", "MXN", "USD"] as const;
+// Fork AutoVenta: `ARS` entra para as concessionárias da Argentina, que vendem em
+// pesos e em dólares. `formatCents(2500000000, "ARS")` → `"$ 25.000.000,00"`.
+export const MOEDAS_SERVIDAS = ["AOA", "ARS", "BRL", "EUR", "MXN", "USD"] as const;
 export type MoedaServida = (typeof MOEDAS_SERVIDAS)[number];
 
 /** O que o `default` da coluna grava quando ninguém escolheu. */

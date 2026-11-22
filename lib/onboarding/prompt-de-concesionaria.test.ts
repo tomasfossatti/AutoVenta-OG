@@ -29,8 +29,9 @@ describe("o prompt de concessionária (fork AutoVenta, etapa 1)", () => {
 
   it("mantém os limites firmes", () => {
     const prompt = promptDeConcesionaria(base);
-    expect(prompt).toContain("Nunca digas que una unidad está disponible");
-    expect(prompt).toContain("No informes precios");
+    expect(prompt).toContain("Nunca des un precio que no salga del catálogo");
+    expect(prompt).toContain("no le des el precio y pasá la conversación a un vendedor");
+    expect(prompt).toContain("No digas que la agencia no la tiene");
     expect(prompt).toContain("No informes tasas, cuotas");
     expect(prompt).toContain("Nunca digas que un crédito está aprobado");
     expect(prompt).toContain("No confirmes visitas ni test drives");
@@ -40,13 +41,16 @@ describe("o prompt de concessionária (fork AutoVenta, etapa 1)", () => {
     const prompt = promptDeConcesionaria(base);
     expect(prompt).toContain("## Mensajes ambiguos, incompletos o fuera de tema");
     expect(prompt).toContain("Ejemplo 1, lead claro");
-    expect(prompt).toContain("Ejemplo 2, lead ambiguo");
-    expect(prompt).toContain("Ejemplo 3, fuera de tema");
+    expect(prompt).toContain("Ejemplo 2, unidad cargada en el catálogo");
+    expect(prompt).toContain("Ejemplo 3, unidad que no está cargada");
+    expect(prompt).toContain("Ejemplo 4, lead ambiguo");
+    expect(prompt).toContain("Ejemplo 5, fuera de tema");
   });
 
-  it("não fala de recurso que ainda não existe como se estivesse ligado", () => {
+  it("etapa 2: usa o catálogo, e segue sem financiamento nem agenda", () => {
     const prompt = promptDeConcesionaria(base);
-    expect(prompt).toContain("Hoy no tenés el stock de la agencia");
+    expect(prompt).toContain("buscala en el catálogo antes de responder");
+    expect(prompt).toContain("No tenés las condiciones de financiación ni la agenda de visitas");
     expect(prompt).not.toMatch(/agendá|te agendo|está agendad/i);
   });
 
@@ -54,5 +58,12 @@ describe("o prompt de concessionária (fork AutoVenta, etapa 1)", () => {
     const prompt = promptDeConcesionaria(base);
     expect(prompt).not.toContain("—");
     expect(prompt).not.toMatch(/(?<!\p{L})(?:puedes|tienes|quieres|eres|tú|contigo)(?!\p{L})/iu);
+  });
+});
+
+describe("o catálogo que o prompt cita existe no agente do onboarding", () => {
+  it("a busca do catálogo nasce ligada (pacote `vender`)", async () => {
+    const { capacidadesPadraoDoOnboarding } = await import("@/lib/ai/agents/capacidades-padrao");
+    expect(capacidadesPadraoDoOnboarding()).toContain("crm_search_products");
   });
 });

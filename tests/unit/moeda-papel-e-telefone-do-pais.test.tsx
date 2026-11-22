@@ -86,10 +86,10 @@ describe("1. o campo de moeda segue a moeda da organização", () => {
    * usá-la para formatar o exemplo e tirar o símbolo. A moeda chegava até a
    * porta e parava ali; agora ela atravessa (`semAMoeda` → `parseReaisToCents`).
    */
-  it("⭐ em dólar, `$1,300.00` são mil e trezentos e `$1.30` é um e trinta", () => {
-    expect(lerCampoDeMoeda("$1,300.00", "USD")).toBe(130000);
-    expect(lerCampoDeMoeda("1,300", "USD")).toBe(130000);
-    expect(lerCampoDeMoeda("$1.30", "USD")).toBe(130);
+  it("⭐ em dólar (fork AutoVenta, convenção argentina), `US$ 1.300,00` são mil e trezentos", () => {
+    expect(lerCampoDeMoeda("US$ 1.300,00", "USD")).toBe(130000);
+    expect(lerCampoDeMoeda("1.300", "USD")).toBe(130000);
+    expect(lerCampoDeMoeda("US$ 1,30", "USD")).toBe(130);
   });
 
   it("em euro, escreve o valor em euro e lê o que se digita, com ou sem o símbolo", () => {

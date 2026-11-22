@@ -63,12 +63,19 @@ describe("parseReaisToCents", () => {
  * milhar, que é o que desambigua o sinal solitário nas duas convenções.
  */
 describe("parseReaisToCents — o separador vem da MOEDA da organização (#3331)", () => {
-  it("⭐ dólar: '1,300' são mil e trezentos, não um e trinta", () => {
-    expect(parseReaisToCents("1,300", "USD")).toBe(130000);
+  // Fork AutoVenta: o dólar segue a convenção argentina (`es-AR`, ver
+  // `LOCALE_DA_MOEDA_SEM_PAIS`), em que o ponto agrupa o milhar e a vírgula é o
+  // decimal. A convenção norte-americana segue valendo no peso mexicano.
+  it("⭐ dólar (fork AutoVenta): '28.500' são vinte e oito mil e quinhentos", () => {
+    expect(parseReaisToCents("28.500", "USD")).toBe(2850000);
   });
 
-  it("dólar: '1,234.56' são mil duzentos e trinta e quatro e cinquenta e seis", () => {
-    expect(parseReaisToCents("1,234.56", "USD")).toBe(123456);
+  it("dólar (fork AutoVenta): '1.234,56' são mil duzentos e trinta e quatro e cinquenta e seis", () => {
+    expect(parseReaisToCents("1.234,56", "USD")).toBe(123456);
+  });
+
+  it("peso mexicano: '1,300' são mil e trezentos, não um e trinta", () => {
+    expect(parseReaisToCents("1,300", "MXN")).toBe(130000);
   });
 
   it("real: '1.300' continua mil e trezentos (nada muda para quem já usa)", () => {
@@ -85,8 +92,8 @@ describe("parseReaisToCents — o separador vem da MOEDA da organização (#3331
    */
   it("⭐ a mesma string muda de leitura conforme a moeda", () => {
     expect(parseReaisToCents("1.300", "BRL")).toBe(130000);
-    expect(parseReaisToCents("1.300", "USD")).toBe(130);
-    expect(parseReaisToCents("1,300", "USD")).toBe(130000);
+    expect(parseReaisToCents("1.300", "MXN")).toBe(130);
+    expect(parseReaisToCents("1,300", "MXN")).toBe(130000);
   });
 
   /**
@@ -175,7 +182,9 @@ describe("formatCents", () => {
   it("formata cada moeda na convenção de quem a usa", () => {
     expect(semNbsp(formatCents(24990, "BRL"))).toBe("R$ 249,90");
     expect(semNbsp(formatCents(24990, "MXN"))).toBe("$249.90");
-    expect(semNbsp(formatCents(24990, "USD"))).toBe("$249.90");
+    // Fork AutoVenta: `US$` para não confundir com o peso argentino.
+    expect(semNbsp(formatCents(24990, "USD"))).toBe("US$ 249,90");
+    expect(semNbsp(formatCents(2500000000, "ARS"))).toBe("$ 25.000.000,00");
     // Kwanza: símbolo DEPOIS do número e vírgula decimal, que é a convenção de
     // Angola — `formatadorDa` maximiza `und-AO` para `pt-AO` e é o ICU que
     // decide, não uma tabela nossa.
@@ -336,11 +345,11 @@ describe("formatSomaPorMoeda", () => {
       ["BRL", 10000],
     ]);
     expect(semNbsp(formatSomaPorMoeda(soma, formatCents, { primeira: "USD" }))).toBe(
-      "$100.00 + R$ 100,00 + 100,00 €",
+      "US$ 100,00 + R$ 100,00 + 100,00 €",
     );
     // `primeira` fora da soma é ignorada — não inventa uma parcela zerada.
     expect(semNbsp(formatSomaPorMoeda(soma, formatCents, { primeira: "MXN" }))).toBe(
-      "R$ 100,00 + 100,00 € + $100.00",
+      "R$ 100,00 + 100,00 € + US$ 100,00",
     );
   });
 
@@ -349,9 +358,15 @@ describe("formatSomaPorMoeda", () => {
       ["MXN", 150000],
       ["USD", 10000],
     ]);
-    expect(semNbsp(formatSomaPorMoeda(pesoEDolar, formatCents))).toBe(
-      "$1,500.00 MXN + $100.00 USD",
-    );
+    // Fork AutoVenta: o dólar já sai `US$`, então só o peso tem o `$` e nenhum
+    // dos dois precisa do código. O caso do símbolo repetido é o peso argentino
+    // ao lado do mexicano.
+    expect(semNbsp(formatSomaPorMoeda(pesoEDolar, formatCents))).toBe("$1,500.00 + US$ 100,00");
+    const doisPesos = new Map([
+      ["MXN", 150000],
+      ["ARS", 10000],
+    ]);
+    expect(semNbsp(formatSomaPorMoeda(doisPesos, formatCents))).toMatch(/MXN.*ARS|ARS.*MXN/);
 
     const realEEuro = new Map([
       ["BRL", 10000],

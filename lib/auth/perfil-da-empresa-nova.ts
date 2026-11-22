@@ -101,6 +101,8 @@ const FUSO_DO_PAIS: Record<string, string> = {
  * país não usa seria inventar.
  */
 const MOEDA_DO_PAIS: Record<string, MoedaServida> = {
+  // Fork AutoVenta: a empresa argentina nasce em pesos.
+  AR: "ARS",
   MX: "MXN",
   EC: "USD",
   US: "USD",

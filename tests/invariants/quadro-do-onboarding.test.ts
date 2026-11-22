@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { sql, lastLine } from "./gov-helpers";
+import { sqlDoFunilDoUpstream } from "./autoventa-funil-do-upstream";
 
 /**
  * A 0156 cobrada no banco que o clone recebe.
@@ -22,6 +23,8 @@ function criarTenant(slug: string): { org: string; pipeline: string } {
     insert into public.organizations (slug, display_name, legal_name, status)
     values ('${slug}', '${slug}', '${slug}', 'active')
     on conflict (slug) do update set display_name = excluded.display_name;
+    -- Fork AutoVenta: o funil "Pedidos" do upstream, que a 9901 deixou de semear.
+    ${sqlDoFunilDoUpstream(`select id from public.organizations where slug = '${slug}'`)}
     select o.id::text, p.id::text
       from public.organizations o
       join public.crm_pipelines p on p.organization_id = o.id and p.is_default

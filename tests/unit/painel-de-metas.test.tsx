@@ -278,7 +278,7 @@ describe("MetaDoMesPanel", () => {
             negocios_com_recorrencia: 1,
           },
           {
-            moeda: "USD",
+            moeda: "MXN",
             unico_centavos: 100_000,
             recorrente_mensal_centavos: 20_000,
             negocios: 1,

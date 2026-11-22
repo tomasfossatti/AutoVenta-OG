@@ -98,7 +98,14 @@ function fakeDb(total: number, tetoDoServidor = 1000, contaOculta = false) {
   return {
     chamadas,
     ctx: {
-      supabase: { from: () => q },
+      // Fork AutoVenta: a busca também lê as fichas de veículo; aqui não há
+      // nenhuma, e essa leitura fica fora das `chamadas` medidas do catálogo.
+      supabase: {
+        from: (tabela: string) =>
+          tabela === "catalog_vehicle_details"
+            ? { select: () => ({ eq: () => ({ in: async () => ({ data: [], error: null }) }) }) }
+            : q,
+      },
       organizationId: "org-1",
     } as never,
   };

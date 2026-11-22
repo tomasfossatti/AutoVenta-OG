@@ -86,11 +86,19 @@ describe("perfilDaEmpresaNova — a regra", () => {
   });
 
   it("país cuja moeda o produto não serve fica com a moeda padrão (não inventa)", () => {
+    expect(perfilDaEmpresaNova({ idioma: "es", fuso: "America/Santiago" })).toEqual({
+      locale: "es",
+      timezone: "America/Santiago",
+    });
+    expect(perfilDaEmpresaNova({ idioma: "es", fuso: "Europe/Madrid" }).currency).toBe("EUR");
+  });
+
+  it("fork AutoVenta: a empresa argentina nasce em pesos", () => {
     expect(perfilDaEmpresaNova({ idioma: "es", fuso: "America/Argentina/Buenos_Aires" })).toEqual({
       locale: "es",
       timezone: "America/Argentina/Buenos_Aires",
+      currency: "ARS",
     });
-    expect(perfilDaEmpresaNova({ idioma: "es", fuso: "Europe/Madrid" }).currency).toBe("EUR");
   });
 
   it("toda moeda da tabela é servida, e todo fuso da tabela é oferecido", () => {

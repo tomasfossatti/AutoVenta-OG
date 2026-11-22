@@ -5003,6 +5003,70 @@ export type Database = {
           },
         ];
       };
+      catalog_vehicle_details: {
+        Row: {
+          anio: number | null;
+          color: string | null;
+          combustible: string | null;
+          condicion: string;
+          created_at: string;
+          estado: string;
+          kilometros: number | null;
+          modelo: string | null;
+          organization_id: string;
+          product_id: string;
+          transmision: string | null;
+          updated_at: string;
+          version: string | null;
+        };
+        ComputedFields: never;
+        Insert: {
+          anio?: number | null;
+          color?: string | null;
+          combustible?: string | null;
+          condicion?: string;
+          created_at?: string;
+          estado?: string;
+          kilometros?: number | null;
+          modelo?: string | null;
+          organization_id: string;
+          product_id: string;
+          transmision?: string | null;
+          updated_at?: string;
+          version?: string | null;
+        };
+        Update: {
+          anio?: number | null;
+          color?: string | null;
+          combustible?: string | null;
+          condicion?: string;
+          created_at?: string;
+          estado?: string;
+          kilometros?: number | null;
+          modelo?: string | null;
+          organization_id?: string;
+          product_id?: string;
+          transmision?: string | null;
+          updated_at?: string;
+          version?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "catalog_vehicle_details_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "catalog_vehicle_details_product_id_fkey";
+            columns: ["product_id"];
+            isOneToOne: true;
+            referencedRelation: "catalog_products";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       channel_connection_requests: {
         Row: {
           channel_session_id: string | null;
@@ -15683,6 +15747,7 @@ export type Database = {
         Returns: Json;
       };
       fn_autonomous_turn_revoked: { Args: { p_job: string; p_org: string }; Returns: boolean };
+      fn_autoventa_sembrar_embudo_ventas: { Args: { p_organization_id: string }; Returns: string };
       fn_buscar_trechos_das_fontes: {
         Args: {
           p_embedding: string;

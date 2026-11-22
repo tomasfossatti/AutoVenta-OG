@@ -1,3 +1,13 @@
+import {
+  lerCombustible,
+  lerCondicion,
+  lerEstado,
+  lerInteiro,
+  lerMoneda,
+  lerTransmision,
+  type FichaDelVehiculo,
+  type MonedaDelVehiculo,
+} from "@/lib/catalogo/vehiculo";
 import { MAXIMO_DE_FOTOS } from "@/lib/catalogo/fotos";
 import { parseCsv } from "@/lib/contacts/csv";
 import { precoParaCentavos } from "@/lib/schemas/produtos";
@@ -57,7 +67,33 @@ const COLUNAS: Record<string, readonly string[]> = {
     "imagen",
     "imagenes",
   ],
+  // ─── Fork AutoVenta: a ficha do veículo e a moeda da unidade ────────────────
+  // (`lib/catalogo/vehiculo.ts`). Basta UMA destas colunas para a linha ganhar
+  // ficha; a que faltar fica com o padrão (usado, disponível).
+  condicion: ["condicion", "condición", "0km o usado", "nuevo o usado"],
+  modelo: ["modelo"],
+  version: ["version", "versión"],
+  anio: ["anio", "año", "ano"],
+  kilometros: ["km", "kms", "kilometros", "kilómetros", "kilometraje"],
+  combustible: ["combustible"],
+  transmision: ["transmision", "transmisión", "caja"],
+  color: ["color"],
+  estado: ["estado", "situacion", "situación"],
+  moeda: ["moneda", "divisa"],
 };
+
+/** As colunas da ficha do veículo (fork AutoVenta). */
+const COLUNAS_DA_FICHA = [
+  "condicion",
+  "modelo",
+  "version",
+  "anio",
+  "kilometros",
+  "combustible",
+  "transmision",
+  "color",
+  "estado",
+] as const;
 
 function normalizarCabecalho(texto: string): string {
   return texto
@@ -231,6 +267,10 @@ export interface LinhaImportada {
    * mantém intacta a foto que a tela gravou.
    */
   fotos?: string[];
+  /** Fork AutoVenta: a ficha, quando a planilha traz alguma coluna dela. */
+  vehiculo?: FichaDelVehiculo;
+  /** Fork AutoVenta: a moeda da unidade, quando a planilha traz a coluna. */
+  moeda?: MonedaDelVehiculo;
 }
 
 export interface ErroDaLinha {
@@ -384,6 +424,23 @@ export function lerPlanilha(
       continue;
     }
 
+    // Fork AutoVenta: a ficha do veículo e a moeda. Valor que não se reconhece
+    // recusa a linha com o motivo, como o preço: um "Señada" lido errado viraria
+    // uma unidade oferecida como disponível.
+    const ficha = fichaDaLinha(valor, campos, _t);
+    if (ficha && "motivo" in ficha) {
+      erros.push({ linha: numeroNaPlanilha, motivo: ficha.motivo });
+      continue;
+    }
+    const moedaDaLinha = campos.has("moeda") ? lerMoneda(valor("moeda")) : null;
+    if (moedaDaLinha === undefined) {
+      erros.push({
+        linha: numeroNaPlanilha,
+        motivo: _t('moeda não reconhecida ("{valor}") — use ARS ou USD').replace("{valor}", () => valor("moeda")),
+      });
+      continue;
+    }
+
     // Sem código na planilha, o nome vira a identidade. É o que permite reimportar
     // a mesma planilha atualizando em vez de duplicar — que é o gesto real da
     // loja quando o preço muda. O corte em 60 caracteres fica em
@@ -432,8 +489,58 @@ export function lerPlanilha(
       controla_estoque: temColunaEstoque,
       ...(descricao ? { descricao } : {}),
       ...(fotos.fotos ? { fotos: fotos.fotos } : {}),
+      ...(ficha ? { vehiculo: ficha.ficha } : {}),
+      ...(moedaDaLinha ? { moeda: moedaDaLinha } : {}),
     });
   }
 
   return { produtos, erros, colunasIgnoradas };
+}
+
+/**
+ * Fork AutoVenta: a ficha da linha, ou `null` quando a planilha não traz
+ * nenhuma coluna da ficha. Só os campos que a planilha traz entram; o que ela
+ * não traz fica com o padrão do banco (usado, disponível).
+ */
+function fichaDaLinha(
+  valor: (campo: string) => string,
+  campos: Set<string>,
+  _t: (texto: string) => string,
+): { ficha: FichaDelVehiculo } | { motivo: string } | null {
+  if (!COLUNAS_DA_FICHA.some((c) => campos.has(c))) return null;
+  const recusa = (rotulo: string, campo: string) => ({
+    motivo: _t("{campo} não reconhecido (\"{valor}\")")
+      .replace("{campo}", () => _t(rotulo))
+      .replace("{valor}", () => valor(campo)),
+  });
+
+  const condicion = lerCondicion(valor("condicion"));
+  if (condicion === undefined) return recusa("Condição", "condicion");
+  const combustible = lerCombustible(valor("combustible"));
+  if (combustible === undefined) return recusa("Combustível", "combustible");
+  const transmision = lerTransmision(valor("transmision"));
+  if (transmision === undefined) return recusa("Câmbio", "transmision");
+  const estado = lerEstado(valor("estado"));
+  if (estado === undefined) return recusa("Estado", "estado");
+  const anio = lerInteiro(valor("anio"));
+  if (anio === undefined || (anio !== null && (anio < 1950 || anio > 2100))) return recusa("Ano", "anio");
+  const kilometros = lerInteiro(valor("kilometros"));
+  if (kilometros === undefined || (kilometros !== null && kilometros > 2_000_000)) {
+    return recusa("Quilometragem", "kilometros");
+  }
+
+  const curto = (campo: string, max: number) => valor(campo).slice(0, max).trim() || null;
+  return {
+    ficha: {
+      condicion: condicion ?? "usado",
+      modelo: curto("modelo", 80),
+      version: curto("version", 80),
+      anio,
+      kilometros,
+      combustible,
+      transmision,
+      color: curto("color", 40),
+      estado: estado ?? "disponible",
+    },
+  };
 }

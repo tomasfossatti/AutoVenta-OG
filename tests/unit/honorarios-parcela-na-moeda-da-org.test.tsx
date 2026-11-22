@@ -29,7 +29,7 @@ vi.mock("@/hooks/i18n/useT", () => ({ useT: () => (s: string) => s }));
 vi.mock("@/hooks/i18n/useLocaleDeData", () => ({ useTagDeIdioma: () => "pt-BR" }));
 // A régua de DIGITAÇÃO já lê a moeda da organização desde o #3378; aqui o
 // assunto é o RÓTULO da linha, então o leitor de sessão só precisa existir.
-vi.mock("@/hooks/auth/AuthProvider", () => ({ useMoedaDaOrgAtiva: () => "USD" }));
+vi.mock("@/hooks/auth/AuthProvider", () => ({ useMoedaDaOrgAtiva: () => "MXN" }));
 
 import { Parcelas } from "@/app/app/honorarios/_parcelas";
 
@@ -71,7 +71,7 @@ beforeEach(() => vi.clearAllMocks());
 
 describe("parcelas de honorários na tela", () => {
   it("a parcela em dólar sai em dólar, e não em real", async () => {
-    montar([parcela("p-usd", "USD", 130000, "2026-11-10")]);
+    montar([parcela("p-usd", "MXN", 130000, "2026-11-10")]);
 
     const linha = semNbsp((await screen.findByText("$1,300.00", { exact: false })).closest("tr")!.textContent ?? "");
     expect(linha).toContain("$1,300.00");

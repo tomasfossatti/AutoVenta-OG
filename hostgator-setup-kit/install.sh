@@ -2341,8 +2341,8 @@ begin
     -- pelos convidados que ainda não existem. Quem entra sem preferência
     -- própria cai neste valor, então gravar só no dono entregaria o sistema em
     -- português para todo mundo que ele convidasse numa instalação em espanhol.
-    insert into public.organizations (slug, display_name, legal_name, locale, timezone, created_by)
-    values ('minha-empresa','Minha Empresa','Minha Empresa','${APP_LOCALE:-es}', 'America/Argentina/Buenos_Aires', v_uid)
+    insert into public.organizations (slug, display_name, legal_name, locale, timezone, currency, created_by)
+    values ('minha-empresa','Minha Empresa','Minha Empresa','${APP_LOCALE:-es}', 'America/Argentina/Buenos_Aires', 'ARS', v_uid)
     returning id into v_org;
   else
     -- Re-execução do instalador com outra resposta: quem rodou de novo para
