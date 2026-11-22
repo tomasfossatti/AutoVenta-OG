@@ -4535,3 +4535,52 @@ ausentes (sin WAHA, Redis, Resend ni claves de IA).
 Banco (RLS entre agencias, solo el gerente cambia el estado, CHECK, cascada): `tests/invariants/autoventa-etapa-2.test.ts`.
 **No medido acá:** la respuesta del agente por WhatsApp real con el stock cargado.
 Evidencia: `evidence/autoventa-etapa-2/00-lista-de-embudos.png`, `evidence/autoventa-etapa-2/01-embudo-ventas.png`, `evidence/autoventa-etapa-2/02-alta-con-ficha.png`, `evidence/autoventa-etapa-2/03-unidad-en-el-stock.png`, `evidence/autoventa-etapa-2/04-planilla-importada.png`, `evidence/autoventa-etapa-2/05-edicion-senado.png`, `evidence/autoventa-etapa-2/06-unidad-senada.png`.
+
+## J-autoventa-3 — Usado en parte de pago y tasación, en español `[P1]` (2026-11-21)
+
+Fork AutoVenta, etapa 3. Migration 9904 (campos `usado_*` en el embudo "Ventas" y `autoventa_tasaciones`).
+Recorrido: `evidence/autoventa-etapa-3/qa-recorrido.mts` contra el stack local (`pnpm local:up`: `next start`
+en contenedor + Supabase local), en una organización de QA aislada que `qa-sembrar.mts` crea y borra
+(`--apagar`), con un gerente y un vendedor reales y la interfaz en español. Sin claves de IA ni WhatsApp.
+
+| Caso | Qué prueba | Cómo |
+|---|---|---|
+| Datos del usado | con "¿Entrega usado?" en sí, la operación muestra marca, modelo, km, combustible, transmisión, color, dueños, estado y fotos | E2E (pantalla) |
+| Vendedor pide | sin tasación, el vendedor ve "Pedir tasación" y no ve "Cargar tasación"; al pedir queda "Pendiente" | E2E (pantalla) |
+| Gerente tasa | el gerente carga $ 12.000.000 en pesos; queda "Vigente", con vencimiento a 7 días en el fuso de la agencia | E2E (pantalla) |
+| Respuesta del cliente | el vendedor registra "El cliente aceptó" y la tasación queda "Aceptada por el cliente" | E2E (pantalla) |
+| Celular | 390 px sin scroll lateral | E2E (pantalla) |
+| Operación nueva en pesos | el gerente crea una operación por "Nuevo negocio": "Valor ($)" en el formulario y en la ficha, guardada en ARS | E2E (pantalla) |
+| Tarjeta sin usado | la tarjeta del tablero no muestra "Fotos del usado" cuando la operación no entrega usado (respeta `mostrar_quando`, como la ficha) | E2E (pantalla) + `tests/unit/arquivo-no-card-respeita-mostrar-quando.test.ts` |
+
+Banco (RLS entre agencias, solo el gerente pone valor, transiciones, un pedido abierto por operación, valor
+inmutable, CHECK, cascada): `tests/invariants/autoventa-etapa-3.test.ts`. Agente (sin valor salvo tasación
+vigente, cerca del cliente del turno, pedido idempotente): `tests/unit/autoventa-tasacion-agente.test.ts`.
+**No medido acá:** la conversación real por WhatsApp con un modelo de IA usando las dos herramientas.
+Evidencia: `evidence/autoventa-etapa-3/01-vendedor-ve-el-usado-sin-tasacion.png`, `evidence/autoventa-etapa-3/02-vendedor-pidio-la-tasacion.png`, `evidence/autoventa-etapa-3/03-gerente-carga-la-tasacion.png`, `evidence/autoventa-etapa-3/04-gerente-tasacion-vigente.png`, `evidence/autoventa-etapa-3/05-vendedor-cliente-acepto.png`, `evidence/autoventa-etapa-3/06-celular-seccion-tasacion.png`, `evidence/autoventa-etapa-3/07-gerente-nuevo-negocio-en-pesos.png`, `evidence/autoventa-etapa-3/08-ficha-del-negocio-en-pesos.png`.
+
+## J-autoventa-3b — Seña y cierre de la operación, en español `[P1]` (2026-11-21)
+
+Fork AutoVenta, etapa 3, parte 2. Migration 9905 (`autoventa_senas` y `autoventa_cierres`).
+Recorrido: `evidence/autoventa-etapa-3-sena/qa-recorrido.mts` contra el stack local (`pnpm local:up`: `next start`
+en contenedor + Supabase local), en una organización de QA aislada que `qa-sembrar.mts` crea y borra
+(`--apagar`), con un gerente y un vendedor reales, un usado y un 0 km en el stock, y la interfaz en español.
+Sin claves de IA ni WhatsApp.
+
+| Caso | Qué prueba | Cómo |
+|---|---|---|
+| Vendedor registra la seña | elige la Hilux del stock, $ 500.000 en pesos, comprobante PDF; queda "Seña vigente" con el link al comprobante, que abre; no ve "Anular seña" | E2E (pantalla) |
+| La unidad se seña sola | la Hilux figura "Señado" en el stock y la operación pasó a la etapa Señado, sin editar la ficha | E2E (pantalla) + lectura de la etapa |
+| Papelería | patente inválida rechazada en pantalla; AF123CD, 08 firmado y transferencia en trámite quedan guardados; el usado no muestra patentamiento | E2E (pantalla) |
+| 0 km | la Amarok reservada se puede señar en dólares; muestra patentamiento y no transferencia; sin comprobante queda marcada "Sin comprobante"; la Hilux ya señada no aparece en la lista | E2E (pantalla) |
+| Gerente anula | sin motivo no deja; con motivo la seña pasa al historial y la Amarok vuelve a "Disponible" | E2E (pantalla) |
+| Entrega | el vendedor registra la entrega: seña aplicada, Hilux "Vendido" en el stock, la papelería queda bloqueada | E2E (pantalla) |
+| Celular | 390 px sin scroll lateral | E2E (pantalla) |
+
+Banco (RLS entre agencias, vendedor registra y no anula, unidad disponible o reservada, una seña vigente por
+unidad y por operación, monto inmutable, `aplicada` solo por la entrega, la ficha no sale de `senado` a mano,
+entrega inmutable, cascada que libera la unidad): `tests/invariants/autoventa-etapa-3-sena.test.ts`. Agente (solo
+lectura, sin monto ni fecha de entrega, trámites según 0 km o usado, cerca del cliente del turno):
+`tests/unit/autoventa-sena-agente.test.ts`.
+**No medido acá:** la conversación real por WhatsApp con un modelo de IA usando `autoventa_ver_cierre`.
+Evidencia: `evidence/autoventa-etapa-3-sena/01-vendedor-registra-la-sena.png`, `evidence/autoventa-etapa-3-sena/02-sena-vigente-con-comprobante.png`, `evidence/autoventa-etapa-3-sena/03-hilux-senada-en-el-stock.png`, `evidence/autoventa-etapa-3-sena/04-vendedor-carga-la-papeleria.png`, `evidence/autoventa-etapa-3-sena/05-amarok-senada-sin-comprobante.png`, `evidence/autoventa-etapa-3-sena/06-gerente-anula-la-sena.png`, `evidence/autoventa-etapa-3-sena/07-sena-anulada-en-el-historial.png`, `evidence/autoventa-etapa-3-sena/08-vendedor-registra-la-entrega.png`, `evidence/autoventa-etapa-3-sena/09-entregada-sena-aplicada.png`, `evidence/autoventa-etapa-3-sena/10-hilux-vendida-en-el-stock.png`, `evidence/autoventa-etapa-3-sena/11-celular-sena-y-cierre.png`.

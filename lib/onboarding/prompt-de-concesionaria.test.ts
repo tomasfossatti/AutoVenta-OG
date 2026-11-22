@@ -54,6 +54,28 @@ describe("o prompt de concessionária (fork AutoVenta, etapa 1)", () => {
     expect(prompt).not.toMatch(/agendá|te agendo|está agendad/i);
   });
 
+  it("etapa 3: o usado vai para os campos, e o valor só sai de uma tasação vigente", () => {
+    const prompt = promptDeConcesionaria(base);
+    expect(prompt).toContain("## Usado en parte de pago");
+    expect(prompt).toContain("en los campos que empiezan con usado_");
+    expect(prompt).toContain("consultá la tasación con autoventa_ver_tasacion");
+    expect(prompt).toContain("pedila con autoventa_pedir_tasacion");
+    expect(prompt).toContain("no des ningún número, ni aproximado ni en rango");
+    expect(prompt).toContain("Ejemplo 6, usado con tasación vigente");
+    // A frase antiga mandava NUNCA falar valor; agora há um valor que pode ser dito.
+    expect(prompt).not.toContain("No le pongas valor al usado de la persona, porque");
+  });
+
+  it("etapa 3, parte 2: consulta a seña, nunca a registra e nunca promete entrega", () => {
+    const prompt = promptDeConcesionaria(base);
+    expect(prompt).toContain("## Seña, papeles y entrega");
+    expect(prompt).toContain("La seña la registra siempre una persona del equipo, nunca vos.");
+    expect(prompt).toContain("consultá autoventa_ver_cierre");
+    expect(prompt).toContain("Nunca prometas ni estimes una fecha de entrega");
+    expect(prompt).toContain("- pregunta cuándo le entregan el auto;");
+    expect(prompt).toContain("Ejemplo 7, seña registrada y papeles en trámite");
+  });
+
   it("não usa travessão nem tuteio", () => {
     const prompt = promptDeConcesionaria(base);
     expect(prompt).not.toContain("—");
@@ -65,5 +87,20 @@ describe("o catálogo que o prompt cita existe no agente do onboarding", () => {
   it("a busca do catálogo nasce ligada (pacote `vender`)", async () => {
     const { capacidadesPadraoDoOnboarding } = await import("@/lib/ai/agents/capacidades-padrao");
     expect(capacidadesPadraoDoOnboarding()).toContain("crm_search_products");
+  });
+
+  it("as duas ferramentas da tasação nascem ligadas, e quem atualiza o lead também", async () => {
+    const { capacidadesPadraoDoOnboarding } = await import("@/lib/ai/agents/capacidades-padrao");
+    const ligadas = capacidadesPadraoDoOnboarding();
+    expect(ligadas).toContain("autoventa_ver_tasacion");
+    expect(ligadas).toContain("autoventa_pedir_tasacion");
+    expect(ligadas).toContain("crm_update_lead");
+  });
+  it("a consulta da seña nasce ligada, e nenhuma ferramenta registra seña", async () => {
+    const { capacidadesPadraoDoOnboarding } = await import("@/lib/ai/agents/capacidades-padrao");
+    const { allTools } = await import("@/lib/mcp/tools");
+    expect(capacidadesPadraoDoOnboarding()).toContain("autoventa_ver_cierre");
+    const daSena = allTools.filter((t) => /sena|cierre/.test(t.name));
+    expect(daSena.map((t) => [t.name, t.category])).toEqual([["autoventa_ver_cierre", "read"]]);
   });
 });

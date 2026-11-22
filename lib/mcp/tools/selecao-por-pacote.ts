@@ -98,7 +98,33 @@ import { entraPorPacote, type ToolBundle, type ToolRisk } from "./pacotes";
  * devolve. Medido depois da mudança: onboarding 22 (era 24), evoluir 27 (voltou
  * ao valor que 27 atende), reter 34.
  */
-export const TETO_TOOLS_POR_AGENTE = 27;
+/*
+ * ═══ Fork AutoVenta: 29 — o usado em parte de pagamento entra no default ═══════
+ *
+ * As duas capacidades da tasação (`autoventa_ver_tasacion` e
+ * `autoventa_pedir_tasacion`, migration 9904) vão no `vender` DE PROPÓSITO: o
+ * prompt da concessionária (`lib/onboarding/prompt-de-concesionaria.ts`) manda
+ * consultar a tasação antes de falar de valor, e um agente que nasce sem elas
+ * passa a responder "não sei" para a pergunta mais frequente do ramo. A saída
+ * do #4544 (mudar de pacote) aqui deixaria o agente do onboarding sem a regra
+ * que o impede de inventar o valor do usado.
+ *
+ * Medido a partir do agente que nasce (24 capacidades, era 22): o `evoluir`, o
+ * menor segundo pacote, passou de 27 para 29 — e é a regra escrita acima: "o dia
+ * em que o `evoluir` exigir 28, o passo volta a ser ele". 29 é o menor teto em
+ * que um segundo pacote ainda cabe; não é folga nova.
+ */
+/*
+ * ═══ Fork AutoVenta: 30 — a leitura da seña entra no default ═════════════════
+ *
+ * `autoventa_ver_cierre` (migration 9905) vai no `vender` pelo mesmo motivo das
+ * da tasação: o prompt da concessionária manda consultá-la quando o cliente
+ * pergunta pela seña, pelos papéis ou pela entrega, e um agente sem ela inventa
+ * ou cala. Medido pelo `tests/unit/pacote-reserva-vaga-da-critica.test.ts`: com o
+ * agente que nasce em 25 capacidades, o `evoluir` (o menor segundo pacote) exige
+ * 30. É a regra de cima: o teto é o menor em que um segundo pacote ainda cabe.
+ */
+export const TETO_TOOLS_POR_AGENTE = 30;
 
 /** O mínimo que a regra precisa saber de uma capacidade. */
 export interface CapacidadeSelecionavel {

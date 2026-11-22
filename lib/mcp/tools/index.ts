@@ -58,6 +58,7 @@ import {
   crmSaveOrgMemory,
 } from "./evolucao";
 import { crmListContactOrders, crmSearchProducts } from "./comercio";
+import { autoventaPedirTasacion, autoventaVerCierre, autoventaVerTasacion } from "./autoventa";
 import { crmGetHonorariosContrato, crmListHonorariosParcelas } from "./honorarios";
 import { crmDescribeExternalData, crmQueryExternalData } from "./dados-externos";
 import { crmConsultarReceita } from "./receitas-externas";
@@ -149,6 +150,9 @@ export const allTools: ReadonlyArray<McpToolDefinition> = [
   crmSaveOrgMemory,
   crmListContactOrders,
   crmSearchProducts,
+  autoventaVerTasacion,
+  autoventaPedirTasacion,
+  autoventaVerCierre,
   crmGetHonorariosContrato,
   crmListHonorariosParcelas,
   crmPrepararProposta,

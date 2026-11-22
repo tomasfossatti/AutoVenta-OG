@@ -93,6 +93,16 @@ export const MODELOS_DA_OPERACAO: readonly ModeloDePorta[] = [
   "/api/v1/leads/[id]/eventos",
   "/api/v1/leads/[id]/field-proposals",
   "/api/v1/leads/[id]/field-proposals/[pid]",
+  // Fork AutoVenta (migration 9904): a tasação do usado. `resolveAuthDual` com
+  // `mcp:read` no GET e `mcp:write` na escrita; o papel é decidido pela AÇÃO
+  // (pedir/responder `agent`, tasar e mudar vencimento `manager`).
+  "/api/v1/leads/[id]/tasaciones",
+  "/api/v1/leads/[id]/tasaciones/[tasacionId]",
+  // Fork AutoVenta (migration 9905): a seña e o fechamento. `mcp:read` nos GET e
+  // `mcp:write` na escrita; registrar, comprovante e papelada `agent`, anular `manager`.
+  "/api/v1/leads/[id]/senas",
+  "/api/v1/leads/[id]/senas/[senaId]",
+  "/api/v1/leads/[id]/cierre",
   "/api/v1/leads/[id]/lose",
   "/api/v1/leads/[id]/move",
   "/api/v1/leads/[id]/next-action",

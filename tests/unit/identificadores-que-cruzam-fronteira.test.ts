@@ -206,6 +206,9 @@ const SITES: { arquivo: string; fronteira: string; papel?: "gerador" | "validado
   { arquivo: "app/api/v1/conversations/[id]/notes/media/route.ts", fronteira: "storage.chave-de-objeto" },
   // O anexo de lead (#2829): anexo em campo customizado do lead, bucket `internal-media`.
   { arquivo: "app/api/v1/leads/[id]/attachments/route.ts", fronteira: "storage.chave-de-objeto" },
+  // Fork AutoVenta (migration 9905): o comprovante da seña, MESMO molde de chave do
+  // anexo de lead (`{org}/leads/{lead}/sena_comprobante/{uuid}.{ext}`), bucket `internal-media`.
+  { arquivo: "lib/autoventa/comprobante.ts", fronteira: "storage.chave-de-objeto" },
   { arquivo: "app/api/v1/ai/knowledge/sources/upload/route.ts", fronteira: "storage.chave-de-objeto" },
   { arquivo: "app/api/v1/ai/knowledge/sources/route.ts", fronteira: "storage.chave-de-objeto" },
   { arquivo: "app/api/v1/ai/knowledge/sources/[id]/texto/route.ts", fronteira: "storage.chave-de-objeto" },

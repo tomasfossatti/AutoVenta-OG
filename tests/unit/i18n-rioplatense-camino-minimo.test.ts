@@ -113,6 +113,8 @@ const PERMITIDOS = new Set([
   "Pausa entre una respuesta y la siguiente (segundos)",
   "Responde en audio cuando el cliente envía audio, pide audio por escrito o avisa que no puede leer. Quien pide seguir por texto sigue recibiendo texto.",
   "Etiqueta (opcional)",
+  // Fork AutoVenta: "trámite" é substantivo (o estado da transferência), não enclítico de tú.
+  "En trámite",
   "Prueba ejecutada.",
   "Prueba",
   "Cuenta",

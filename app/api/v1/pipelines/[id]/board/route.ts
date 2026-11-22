@@ -34,7 +34,8 @@ import {
   anexarAnexosAosNegocios,
   type LinhaDoAnexoNoQuadro,
 } from "@/lib/kanban/anexos-no-card";
-import { camposDeArquivoDoNegocio } from "@/lib/leads/campos-do-funil";
+import { camposDeArquivoDoNegocio, camposDoFunil, camposPorEscopo } from "@/lib/leads/campos-do-funil";
+import type { CustomFieldDef } from "@/lib/schemas/settings";
 import { diasDeRecorte, recortaEncerradosAntigos } from "@/lib/kanban/recorte-de-encerrados";
 import { anexarTarefasAosNegocios, type LinhaDaTarefaNoQuadro } from "@/lib/kanban/tarefas-no-quadro";
 import { withOwnerUserNames } from "@/lib/kanban/nome-do-dono";
@@ -527,6 +528,7 @@ async function withAnexos(
   organizationId: string,
   leads: Lead[],
   campos: ReturnType<typeof camposDeArquivoDoNegocio>,
+  todosOsCampos?: CustomFieldDef[],
 ): Promise<{ leads: Lead[]; error: string | null; truncado: boolean }> {
   if (leads.length === 0 || campos.length === 0) return { leads, error: null, truncado: false };
 
@@ -553,7 +555,7 @@ async function withAnexos(
   if (erro) return { leads, error: erro, truncado: false };
 
   return {
-    leads: anexarAnexosAosNegocios(leads, linhas, campos) as Lead[],
+    leads: anexarAnexosAosNegocios(leads, linhas, campos, todosOsCampos) as Lead[],
     error: null,
     truncado,
   };
@@ -821,6 +823,8 @@ async function responder(
     (pipeline as Pipeline).organization_id,
     leadsComTarefas.leads,
     camposDeArquivoDoNegocio((pipeline as Pipeline).settings),
+    // Os campos do negócio inteiros: é com eles que o card aplica `mostrar_quando`.
+    camposPorEscopo(camposDoFunil((pipeline as Pipeline).settings ?? null), "negocio"),
   );
   if (leadsComAnexos.error) {
     return fail("internal_error", leadsComAnexos.error, 500, { requestId });

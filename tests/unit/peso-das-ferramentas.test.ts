@@ -88,6 +88,9 @@ const TETO: Readonly<Record<string, { tokens: number; motivo: string }>> = {
   "crm_rollback_ai_agent": { tokens: 235, motivo: EDITAR_ASSISTENTES },
   "crm_list_contact_orders": { tokens: 234, motivo: BASE },
   "crm_search_products": { tokens: 362, motivo: BASE },
+  "autoventa_ver_tasacion": { tokens: 261, motivo: BASE },
+  "autoventa_pedir_tasacion": { tokens: 283, motivo: BASE },
+  "autoventa_ver_cierre": { tokens: 245, motivo: BASE },
   "crm_get_honorarios_contrato": { tokens: 253, motivo: BASE },
   "crm_list_honorarios_parcelas": { tokens: 222, motivo: BASE },
   "crm_preparar_proposta": { tokens: 132, motivo: BASE },
@@ -236,7 +239,13 @@ const TETO: Readonly<Record<string, { tokens: number; motivo: string }>> = {
 // ChatGPT; nenhuma vai para o turno do agente): 2116 das ferramentas e 478 de
 // `configuracoes` no rascunho. MEDIDO no merge com a main de 20/11 (`4c7f1f2fd9`):
 // 45880 = 43286 + 2594 (2026-11-20), não somado à mão.
-const TETO_TOTAL = 45880;
+// +544 com as duas ferramentas da tasação do fork AutoVenta (migration 9904): 261 de
+// `autoventa_ver_tasacion` e 283 de `autoventa_pedir_tasacion`. MEDIDO na branch
+// `claude/etapa-3-usados` sobre a etapa 2: 46424 = 45880 + 544 (2026-11-21).
+// +245 com a leitura da seña e do fechamento do fork AutoVenta (migration 9905),
+// `autoventa_ver_cierre`. MEDIDO na branch `claude/etapa-3-usados`: 46669 = 46424 + 245
+// (2026-11-21).
+const TETO_TOTAL = 46669;
 
 const VARIANTE = "schedule_followup (com negócio)";
 

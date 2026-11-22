@@ -1,3 +1,4 @@
+import { camposVisiveis } from "@/lib/schemas/mostrar-quando";
 import type { CustomFieldDef } from "@/lib/schemas/settings";
 
 /**
@@ -64,11 +65,21 @@ export interface AnexosDoCampoNoCard {
  * payload do quadro não engorda para quem nunca usou o recurso, e o card não
  * muda em nada. Anexo de chave que o funil já não declara não vira bloco (o
  * arquivo continua na tabela e no dossiê; o card não inventa campo).
+ *
+ * CAMPO ESCONDIDO PELA CONDIÇÃO NÃO ENTRA (`mostrar_quando`, #2728). Quando o
+ * chamador passa `todosOsCampos` (os campos do negócio inteiros), cada card
+ * aplica a MESMA régua do dossiê (`camposVisiveis`, com os valores daquele
+ * negócio): "Fotos do usado" só aparece quando "Entrega usado?" é sim. Sem
+ * isso, o campo que a ficha esconde aparecia em todo card como "Nenhum arquivo
+ * anexado" — documento faltando num negócio que nem tem o que anexar. Os
+ * campos inteiros, e não só os de arquivo, porque a condição costuma apontar
+ * para um campo de outro tipo. Sem o parâmetro, o comportamento é o de antes.
  */
 export function anexarAnexosAosNegocios<T extends { id: string }>(
   leads: T[],
   linhas: readonly LinhaDoAnexoNoQuadro[],
   campos: readonly Pick<CustomFieldDef, "key" | "label" | "type">[],
+  todosOsCampos?: readonly Pick<CustomFieldDef, "key" | "mostrar_quando">[],
 ): Array<T & { anexos?: AnexosDoCampoNoCard[] }> {
   const deArquivo = campos.filter((campo) => campo.type === "file");
   // Sem campo `file` no funil, o negócio sai como ENTROU (mesmos objetos, sem
@@ -84,9 +95,21 @@ export function anexarAnexosAosNegocios<T extends { id: string }>(
     porNegocio.set(linha.lead_id, porCampo);
   }
 
+  const temCondicao = (todosOsCampos ?? []).some((campo) => campo.mostrar_quando !== undefined);
+
   return leads.map((lead) => {
     const porCampo = porNegocio.get(lead.id);
-    const anexos: AnexosDoCampoNoCard[] = deArquivo.map((campo) => {
+    const visiveis =
+      todosOsCampos && temCondicao
+        ? new Set(
+            camposVisiveis(
+              todosOsCampos,
+              ((lead as { custom_fields?: Record<string, unknown> | null }).custom_fields ?? {}) as Record<string, unknown>,
+            ).map((campo) => campo.key),
+          )
+        : null;
+    const doCard = visiveis ? deArquivo.filter((campo) => visiveis.has(campo.key)) : deArquivo;
+    const anexos: AnexosDoCampoNoCard[] = doCard.map((campo) => {
       const doCampo = porCampo?.get(campo.key) ?? [];
       // Ordem de upload (mais antigo primeiro), com o id como desempate: duas
       // linhas podem nascer no mesmo segundo e o card não pode trocar de ordem
