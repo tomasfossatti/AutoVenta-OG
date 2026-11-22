@@ -10541,6 +10541,7 @@ export const DICIONARIO: Traducoes = {
     es: "Con esto tu empleado sabe qué autos ofrece la agencia.",
   },
   "Em que província fica a agência?": { es: "¿En qué provincia está la agencia?" },
+  "Oi! Vocês atendem hoje? Queria saber o preço.": { es: "¡Hola! ¿Atienden hoy? Quería saber el precio." },
   "Seu funcionário a menciona ao se apresentar. O horário de atendimento é o da Argentina.": {
     es: "Tu empleado la menciona al presentarse. El horario de atención es el de la Argentina.",
   },

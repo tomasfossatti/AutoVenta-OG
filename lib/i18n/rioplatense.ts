@@ -319,6 +319,8 @@ export const TEXTOS_RIOPLATENSES: Readonly<Record<string, string>> = {
   "O que vale para qualquer atendimento aqui. Pode deixar em branco agora e escrever depois — ele aprende com você ao longo do tempo.": "Lo que vale para cualquier atención de tu empresa. Podés dejarlo en blanco por ahora y escribirlo después: con el tiempo aprende de vos.",
   "O recebimento precisa de atenção. Confira a conexão antes de atender.": "La recepción necesita atención. Revisá la conexión antes de atender.",
   "O teste aqui não passa pelo canal: no WhatsApp real, a IA não responderia a este número.": "La prueba de acá no pasa por el canal: en WhatsApp real, la IA no le respondería a este número.",
+  // O ensaio do onboarding: o exemplo é a consulta típica de uma agência de autos.
+  "Oi! Vocês atendem hoje? Queria saber o preço.": "Hola, ¿tienen alguna camioneta usada? Quería saber precios.",
   "Os templates vivem na sua conta do WhatsApp Business (Meta) — esta tela é um espelho deles. Conecte o canal oficial em": "Las plantillas están en tu cuenta de WhatsApp Business (Meta) y esta pantalla solo las refleja. Conectá el canal oficial en",
   "Outra pessoa está atendendo. Se precisar assumir, use Transferir no topo da conversa.": "Otra persona está atendiendo. Si necesitás asumir, usá Transferir en la parte superior de la conversación.",
   "Ouvir aqui": "Escuchar acá",
