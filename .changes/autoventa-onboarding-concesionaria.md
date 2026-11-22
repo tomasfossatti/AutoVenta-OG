@@ -1,5 +1,5 @@
 ---
-impacto: comportamento_alterado
+impacto: capacidade_nova
 secao: alterado
 titulo: El primer paso pregunta como a una agencia de autos
 ---
