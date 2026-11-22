@@ -179,10 +179,9 @@ describe("o que o sistema ajustou, com as duas cores (#2482)", () => {
 
       it("roxo + cinza: o aviso de cor neutra é do MODO ESCURO, nunca da cor principal", () => {
         const camada = caso.camada({ accent_hex: "#7a5cd6", accent_dark_hex: "#333333" });
-        expect(sigla(camada)).toEqual([
-          "accent_deslocado|claro|--color-accent",
-          "cor_escura_acromatica|escuro|--color-accent",
-        ]);
+        // Fork AutoVenta: com os neutros frios da AutoVenta o roxo já folga no
+        // claro e não anda — sobra só o aviso do modo escuro, que é o objeto aqui.
+        expect(sigla(camada)).toEqual(["cor_escura_acromatica|escuro|--color-accent"]);
         const texto = textos(camada);
         expect(texto).toContain("A cor do modo escuro é um tom neutro");
         expect(texto).not.toContain("reservada ao logo");

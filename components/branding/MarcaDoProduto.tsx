@@ -1,4 +1,4 @@
-import { LOGOTIPO, SIMBOLO } from "@/lib/branding/desenho";
+import { LOGOTIPO, SIMBOLO, type Glifo } from "@/lib/branding/desenho";
 import { cn } from "@/lib/utils";
 
 /**
@@ -6,8 +6,8 @@ import { cn } from "@/lib/utils";
  * ninguém configurou marca própria (`marcaEhADoProduto`, em `lib/branding.ts`).
  *
  * Inline, e não `<img src="/algo.svg">`, por três motivos:
- *  - as cores seguem o TEMA: sálvia mais clara e nome em creme no escuro, como
- *    a régua do produto já define — um arquivo estático teria uma cor só;
+ *  - as cores seguem o TEMA: celeste e naranja um grau mais claros no escuro —
+ *    um arquivo estático teria uma cor só;
  *  - nada em `public/`: um `.svg` fixo ali seria servido na instalação de um
  *    revendedor que configurou a marca dele (ver `lib/branding/desenho.ts`);
  *  - a barra lateral já usa `<img>` para o logo CONFIGURADO, e o e2e
@@ -26,24 +26,26 @@ type Props = {
   readonly decorativo?: boolean;
 };
 
-const SIMBOLO_CLARO_ESCURO = "fill-[#506d48] dark:fill-[#82a077]";
-const NOME_CLARO_ESCURO = "fill-[#1c1a16] dark:fill-[#f5f4ef]";
-const SUFIXO_CLARO_ESCURO = "fill-[#5d594f] dark:fill-[#8e8b7f]";
+const AZUL_CLARO_ESCURO = "fill-[#3874f9] dark:fill-[#5b8cff]";
+const NARANJA_CLARO_ESCURO = "fill-[#fe6700] dark:fill-[#ff7a1f]";
 
 // As classes acima repetem os hexes de `CORES_DA_MARCA` porque o Tailwind só
 // gera utilitário para valor LITERAL no fonte. Quem impede os dois de divergirem
 // é `tests/unit/marca-do-produto.test.tsx`, que compara as classes à paleta —
 // e não uma asserção em runtime: um throw aqui derrubaria a casca inteira.
 export const CLASSES_DE_COR = {
-  simbolo: SIMBOLO_CLARO_ESCURO,
-  nome: NOME_CLARO_ESCURO,
-  sufixo: SUFIXO_CLARO_ESCURO,
+  azul: AZUL_CLARO_ESCURO,
+  naranja: NARANJA_CLARO_ESCURO,
 } as const;
 
 function acessibilidade(nome: string, decorativo: boolean) {
   return decorativo
     ? ({ "aria-hidden": true } as const)
     : ({ role: "img", "aria-label": nome } as const);
+}
+
+function Glifos({ glifos }: { glifos: readonly Glifo[] }) {
+  return glifos.map((g) => <path key={g.d} transform={g.transform} d={g.d} />);
 }
 
 /** O símbolo sozinho — para a barra recolhida, avatar e cantos apertados. */
@@ -54,9 +56,13 @@ export function SimboloDoProduto({ nome, className, decorativo = false }: Props)
       className={cn("shrink-0", className)}
       {...acessibilidade(nome, decorativo)}
     >
-      <g data-marca-parte="simbolo" className={SIMBOLO_CLARO_ESCURO} transform={SIMBOLO.transform}>
-        <path d={SIMBOLO.d} />
-        <rect {...SIMBOLO.modulo} />
+      <g data-marca-parte="simbolo">
+        <g className={AZUL_CLARO_ESCURO}>
+          <Glifos glifos={SIMBOLO.azul} />
+        </g>
+        <g className={NARANJA_CLARO_ESCURO}>
+          <Glifos glifos={SIMBOLO.naranja} />
+        </g>
       </g>
     </svg>
   );
@@ -70,19 +76,21 @@ export function LogotipoDoProduto({ nome, className, decorativo = false }: Props
       className={cn("shrink-0", className)}
       {...acessibilidade(nome, decorativo)}
     >
-      <g data-marca-parte="simbolo" className={SIMBOLO_CLARO_ESCURO} transform={LOGOTIPO.simbolo.transform}>
-        <path d={LOGOTIPO.simbolo.d} />
-        <rect {...LOGOTIPO.simbolo.modulo} />
+      <g data-marca-parte="simbolo">
+        <g className={AZUL_CLARO_ESCURO}>
+          <Glifos glifos={LOGOTIPO.simbolo.azul} />
+        </g>
+        <g className={NARANJA_CLARO_ESCURO}>
+          <Glifos glifos={LOGOTIPO.simbolo.naranja} />
+        </g>
       </g>
-      <g data-marca-parte="nome" className={NOME_CLARO_ESCURO}>
-        {LOGOTIPO.nome.map((g) => (
-          <path key={g.transform} transform={g.transform} d={g.d} />
-        ))}
-      </g>
-      <g data-marca-parte="sufixo" className={SUFIXO_CLARO_ESCURO}>
-        {LOGOTIPO.sufixo.map((g) => (
-          <path key={g.transform} transform={g.transform} d={g.d} />
-        ))}
+      <g data-marca-parte="nome">
+        <g className={AZUL_CLARO_ESCURO}>
+          <Glifos glifos={LOGOTIPO.nome.azul} />
+        </g>
+        <g className={NARANJA_CLARO_ESCURO}>
+          <Glifos glifos={LOGOTIPO.nome.naranja} />
+        </g>
       </g>
     </svg>
   );
