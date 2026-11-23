@@ -39,7 +39,6 @@ vi.mock("@/hooks/auth/AuthProvider", () => ({
 }));
 vi.mock("@/hooks/i18n/useT", () => ({ useT: () => (texto: string) => texto }));
 vi.mock("@/components/theme/theme-toggle", () => ({ ThemeToggle: () => null }));
-vi.mock("@/components/shell/SeletorDeIdioma", () => ({ SeletorDeIdioma: () => null }));
 
 import { UserMenu } from "@/components/shell/UserMenu";
 

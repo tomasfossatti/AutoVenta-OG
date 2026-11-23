@@ -2,7 +2,7 @@
   "id": "perfil",
   "titulo": "Perfil",
   "tela": "/app/settings/profile",
-  "resumo": "Onde você acha todas as Configurações e ajusta o que é só seu: o nome que a equipe vê, a foto, o idioma e o fuso horário.",
+  "resumo": "Onde você acha todas as Configurações e ajusta o que é só seu: o nome que a equipe vê, a foto e o fuso horário.",
   "licoes": [
     {
       "id": "achando-as-configuracoes",
@@ -237,109 +237,18 @@
     },
     {
       "id": "idioma-e-fuso",
-      "titulo": "Idioma e fuso horário",
-      "objetivo": "Escolher em que idioma o sistema aparece para você e conhecer o campo de fuso horário.",
+      "titulo": "Fuso horário",
+      "objetivo": "Conhecer o campo de fuso horário do seu perfil.",
       "papel": "admin",
-      "busca": [
-        "mudar idioma",
-        "sistema em espanhol",
-        "trocar língua",
-        "fuso horário",
-        "horário errado",
-        "português ou espanhol"
-      ],
+      "busca": ["fuso horário", "horário errado"],
       "passos": [
         {
           "id": "p1",
-          "titulo": "Escolher o idioma",
-          "texto": "Clique no campo \"Idioma\" para ver as opções. \"Seguir o idioma da empresa\" faz o sistema aparecer no idioma que a empresa escolheu para todos: se a empresa mudar, você muda junto. Escolhendo \"Português (BR)\" ou \"Español\" e clicando em \"Salvar\", vale a sua escolha, mesmo que a empresa use outro idioma.",
-          "dica": "O idioma da empresa fica em Configurações › Organização.",
-          "rota": "/app/settings/profile",
-          "antes": [
-            {
-              "acao": "click",
-              "alvo": {
-                "role": "combobox",
-                "nome": "Idioma",
-                "exato": true
-              }
-            },
-            {
-              "acao": "aguardar",
-              "alvo": {
-                "role": "listbox"
-              }
-            }
-          ],
-          "destaques": [
-            {
-              "alvo": {
-                "css": "#locale"
-              },
-              "rotulo": "Idioma",
-              "tipo": "caixa"
-            },
-            {
-              "alvo": {
-                "role": "option",
-                "nome": "Seguir o idioma da empresa",
-                "exato": true
-              },
-              "rotulo": "Acompanha a empresa",
-              "tipo": "seta"
-            }
-          ]
-        },
-        {
-          "id": "p2",
-          "titulo": "O atalho do topo",
-          "texto": "Há um jeito mais rápido de trocar o idioma, de qualquer tela: o botão com a sigla do idioma em uso (\"PT\"), no canto de cima, ao lado do botão de tema. Ao escolher outro idioma ali, a página recarrega na hora já no idioma novo, e a escolha fica gravada no seu perfil.",
-          "antes": [
-            {
-              "acao": "press",
-              "tecla": "Escape"
-            },
-            {
-              "acao": "click",
-              "alvo": {
-                "testid": "seletor-de-idioma"
-              }
-            },
-            {
-              "acao": "aguardar",
-              "alvo": {
-                "role": "menu"
-              }
-            }
-          ],
-          "destaques": [
-            {
-              "alvo": {
-                "testid": "seletor-de-idioma"
-              },
-              "rotulo": "Idioma em uso",
-              "tipo": "seta"
-            },
-            {
-              "alvo": {
-                "role": "menu"
-              },
-              "rotulo": "Troca na hora",
-              "tipo": "caixa"
-            }
-          ],
-          "dica": "Escolher um idioma por este atalho faz você parar de acompanhar o idioma da empresa. Para voltar a acompanhá-lo, escolha \"Seguir o idioma da empresa\" no Perfil e clique em \"Salvar\"."
-        },
-        {
-          "id": "p3",
           "titulo": "O fuso horário",
           "texto": "O campo \"Fuso horário\" lista as cidades pelo nome técnico, como \"America/Sao_Paulo\" (horário de Brasília) ou \"America/Manaus\". A escolha fica guardada no seu perfil quando você clica em \"Salvar\", mas hoje ela ainda não muda os horários que você vê: a Agenda segue o fuso da empresa, para todos da equipe verem a mesma semana.",
           "dica": "Se os horários estão errados para a clínica toda, ajuste o fuso em Configurações › Organização.",
+          "rota": "/app/settings/profile",
           "antes": [
-            {
-              "acao": "press",
-              "tecla": "Escape"
-            },
             {
               "acao": "click",
               "alvo": {

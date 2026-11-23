@@ -17,10 +17,9 @@ import {
 import { updateTenant } from "@/app/actions/settings/updateTenant";
 import { useT } from "@/hooks/i18n/useT";
 import { irAoDesafioDeMfa } from "@/lib/auth/ir-ao-desafio-de-mfa";
-import { IDIOMAS_VISIVEIS } from "@/lib/i18n/registro";
 import { MOEDAS_SERVIDAS, simboloDaMoeda, type MoedaServida } from "@/lib/money";
 import { paisesOferecidos, perfilDoPais } from "@/lib/legal/perfil-do-pais";
-import { tenantSchema, type Locale, type TenantInput } from "@/lib/schemas/settings";
+import { tenantSchema, type TenantInput } from "@/lib/schemas/settings";
 import { FUSOS_OFERECIDOS } from "@/lib/tempo/fusos";
 
 interface Props {
@@ -55,7 +54,8 @@ export function TenantForm({ initial, onSave, onSaved }: Props) {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const parsed = tenantSchema.safeParse(form);
+    // AutoVenta es solo para Argentina: la organización queda siempre en español.
+    const parsed = tenantSchema.safeParse({ ...form, locale: "es" });
     if (!parsed.success) {
       toast.error(t("Dados inválidos."));
       return;
@@ -119,24 +119,6 @@ export function TenantForm({ initial, onSave, onSaved }: Props) {
                 {TIMEZONES.map((tz) => (
                   <SelectItem key={tz} value={tz}>
                     {tz}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="locale">{t("Idioma")}</Label>
-            <Select
-              value={form.locale}
-              onValueChange={(v) => set("locale", v as Locale)}
-            >
-              <SelectTrigger id="locale">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {IDIOMAS_VISIVEIS.map(({ codigo, nomeNativo }) => (
-                  <SelectItem key={codigo} value={codigo}>
-                    {nomeNativo}
                   </SelectItem>
                 ))}
               </SelectContent>

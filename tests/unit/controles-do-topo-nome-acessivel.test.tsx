@@ -19,7 +19,6 @@ vi.mock("@/hooks/auth/AuthProvider", () => ({
   useUser: () => user,
   useAuth: () => ({ signOut: vi.fn() }),
 }));
-vi.mock("@/app/actions/settings/trocarIdioma", () => ({ trocarIdioma: vi.fn() }));
 // O UserMenu navega pelo `useRouter` (porta do modo administrador, #3608). Aqui ele
 // é renderizado fora do App Router, e o `useRouter` real estoura "invariant
 // expected app router to be mounted". Só o roteador é substituído: botões, Radix
@@ -32,13 +31,10 @@ vi.mock("@/components/theme/theme-toggle", () => ({ ThemeToggle: () => null }));
 afterEach(cleanup);
 
 describe.each(["pt-BR", "es"])("controles do topo em %s", (locale) => {
-  it("o nome acessível do idioma inclui o código que aparece no botão", () => {
+  it("AutoVenta: el panel no ofrece cambiar de idioma", () => {
     render(<IdiomaProvider locale={locale}><UserMenu /></IdiomaProvider>);
 
-    const seletor = screen.getByTestId("seletor-de-idioma");
-    const textoVisivel = seletor.textContent!.trim();
-    expect(textoVisivel).not.toBe("");
-    expect(seletor).toHaveAccessibleName(expect.stringContaining(textoVisivel));
+    expect(screen.queryByTestId("seletor-de-idioma")).toBeNull();
   });
 
   it.each([
