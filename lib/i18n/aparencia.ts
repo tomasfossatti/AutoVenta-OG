@@ -18,7 +18,7 @@ export const TEXTOS_APARENCIA = {
   "Só você está vendo. Nada foi salvo ainda.": { es: "Solo tú la estás viendo. Todavía no se guardó nada." },
   "Salvar para a equipe": { es: "Guardar para el equipo" },
   "Templates": { es: "Plantillas" },
-  "Cada template muda o fundo, o menu, a tipografia, as cores, os cantos e as sombras, no modo claro e no escuro.": { es: "Cada plantilla cambia el fondo, el menú, la tipografía, los colores, las esquinas y las sombras, en modo claro y oscuro." },
+  "Cada template muda o fundo, o menu, a tipografia, as cores, os cantos e as sombras.": { es: "Cada plantilla cambia el fondo, el menú, la tipografía, los colores, las esquinas y las sombras." },
   "Os ajustes passam por cima do template e continuam valendo se você trocar de template.": { es: "Los ajustes se aplican sobre la plantilla y siguen valiendo si cambias de plantilla." },
   "Claro, escuro ou automático é escolha de cada pessoa, neste navegador.": { es: "Claro, oscuro o automático lo elige cada persona, en este navegador." },
   "Claro": { es: "Claro" },

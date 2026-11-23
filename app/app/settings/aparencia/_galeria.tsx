@@ -12,10 +12,10 @@
  * marcador ao que está salvo. O CSS dos dez templates está na página
  * (`page.tsx`), escopado pelo id, e só pinta o id que o marcador carregar.
  *
- * ── O modo claro/escuro é de cada pessoa ───────────────────────────────────
+ * ── Solo modo claro ─────────────────────────────────────────────────────────
  *
- * Ele continua sendo a preferência que já existia (`lib/theme.tsx`, guardada no
- * navegador). O template é da empresa; o modo, de quem usa.
+ * AutoVenta no tiene modo oscuro (`lib/theme.tsx`): no hay selector de modo y
+ * cada template se muestra solo en claro.
  */
 
 import { useEffect, useMemo, useRef, useState, useTransition, type CSSProperties } from "react";
@@ -40,7 +40,6 @@ import {
 import { TEMPLATES, templatePorId, type Template } from "@/lib/aparencia/catalogo";
 import { CHAVES_DE_FONTE, FONTES, type ChaveDeFonte } from "@/lib/aparencia/fontes";
 import { ehHexValido, normalizarHex } from "@/lib/branding/rampa";
-import { useTheme, type Theme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 
 const ATRIBUTOS = [
@@ -96,11 +95,6 @@ const EFEITOS: { valor: Efeitos; rotulo: string }[] = [
   { valor: "sutil", rotulo: "Sutil" },
   { valor: "desligado", rotulo: "Desligado" },
 ];
-const MODOS: { valor: Theme; rotulo: string }[] = [
-  { valor: "light", rotulo: "Claro" },
-  { valor: "dark", rotulo: "Escuro" },
-  { valor: "system", rotulo: "Automático" },
-];
 
 export function GaleriaDeAparencia({
   gravada,
@@ -112,7 +106,6 @@ export function GaleriaDeAparencia({
 }) {
   const t = useT();
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
   const [salva, setSalva] = useState<Aparencia>(gravada);
   const [rascunho, setRascunho] = useState<Aparencia>(gravada);
   const [salvando, startTransition] = useTransition();
@@ -191,7 +184,7 @@ export function GaleriaDeAparencia({
             {t("Templates")}
           </h2>
           <p className="text-sm text-muted-foreground">
-            {t("Cada template muda o fundo, o menu, a tipografia, as cores, os cantos e as sombras, no modo claro e no escuro.")}
+            {t("Cada template muda o fundo, o menu, a tipografia, as cores, os cantos e as sombras.")}
           </p>
         </div>
         <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 2xl:grid-cols-3">
@@ -228,15 +221,6 @@ export function GaleriaDeAparencia({
         </div>
 
         <div className="grid grid-cols-1 gap-x-8 gap-y-6 rounded-lg border bg-card p-5 lg:grid-cols-2">
-          <Campo rotulo={t("Modo")} ajuda={t("Claro, escuro ou automático é escolha de cada pessoa, neste navegador.")}>
-            <Segmentos
-              rotulo={t("Modo")}
-              opcoes={MODOS.map((m) => ({ valor: m.valor, rotulo: t(m.rotulo) }))}
-              valor={theme}
-              onChange={setTheme}
-            />
-          </Campo>
-
           <Campo
             rotulo={t("Cor principal e logotipo")}
             ajuda={
@@ -410,10 +394,7 @@ function CartaoDoTemplate({
         emUso && "border-accent ring-1 ring-accent",
       )}
     >
-      <div className="grid grid-cols-2 gap-2">
-        <Miniatura template={template} modo="claro" />
-        <Miniatura template={template} modo="escuro" />
-      </div>
+      <Miniatura template={template} modo="claro" />
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2">
           <h3 className="text-base font-semibold">{nome}</h3>
