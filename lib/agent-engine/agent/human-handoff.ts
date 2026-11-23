@@ -86,6 +86,22 @@ const HUMAN_HANDOFF_PATTERNS: readonly RegExp[] = [
   /\bme\s+(?:passa|passe|transfere|transfira|encaminha|encaminhe|manda|mande)\s+(?:pra|para|pro)\s+(?:um[a]?\s+)?(?:atendente|humano|pessoa|gente|setor|comercial)\b/,
   /\batendimento\s+humano\b/,
   /\b(?:atendente|humano|pessoa)\s+de\s+verdade\b/,
+  // ─── Espanhol (fork AutoVenta) ────────────────────────────────────────────
+  // A lista era só PT-BR, e numa agência de Neuquén "quiero hablar con una
+  // persona" não casava nada: a passagem — exigência da Meta, não enfeite —
+  // ficava inteira na mão do modelo. Mesma régua conservadora de cima: verbo de
+  // contato + alvo humano, ou expressão inequívoca. O artigo `el/la` entra
+  // ("hablar con el vendedor" é pedido); o possessivo não ("hablar con mi
+  // esposa" não é). Escritos sem acento, como o texto normalizado.
+  /\b(?:hablar|charlar|conversar|comunicarme)\s+con\s+(?:(?:un|una|el|la)\s+)?(?:persona|humano|asesor|asesora|vendedor|vendedora|operador|operadora|representante|responsable|encargado|encargada)\b/,
+  // "hablar con alguien" só quando o alguém é da agência ou a frase acaba ali:
+  // "tengo que hablar con alguien de mi familia" não pede atendimento.
+  /\bhablar\s+con\s+alguien(?:\s*$|\s*[.,!?]|\s+(?:de\s+(?:la\s+agencia|la\s+concesionaria|ventas|ustedes)|del\s+equipo))/,
+  /\b(?:me\s+)?(?:pasas|pasa|pasame|paseme|comunicas|comunicame|comuniqueme|derivas|derivame|transferime)\s+(?:con|a)\s+(?:(?:un|una|el|la)\s+)?(?:persona|humano|asesor|asesora|vendedor|vendedora|operador|operadora|alguien|encargado|encargada)\b/,
+  /\bque\s+me\s+atienda\s+(?:(?:un|una|el|la)\s+)?(?:persona|humano|alguien|vendedor|vendedora|asesor|asesora)\b/,
+  /\batencion\s+humana\b/,
+  /\b(?:persona|humano)\s+(?:real|de\s+verdad)\b/,
+  /\bno\s+quiero\s+(?:hablar|seguir\s+hablando)\s+con\s+(?:(?:un|una|el|la)\s+)?(?:bot|robot|maquina|contestador)\b/,
 ];
 
 /** True se a mensagem do lead é um pedido explícito de atendimento humano (determinístico). */

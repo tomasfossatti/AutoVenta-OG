@@ -4,8 +4,8 @@ import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useT } from "@/hooks/i18n/useT";
-
-const DEFAULTS = ["falar com humano", "atendente", "pessoa real"];
+import { palavrasDePassagemPadrao } from "@/lib/ai/agents/palavras-de-passagem-padrao";
+import { useIdioma } from "@/lib/i18n/IdiomaProvider";
 
 interface Props {
   value: string[];
@@ -15,6 +15,10 @@ interface Props {
 
 export function HandoffKeywordsInput({ value, onChange, disabled }: Props) {
   const t = useT();
+  // As sugestões seguem o idioma de quem configura: em `es`, oferecer
+  // "falar com humano" a uma agência de Neuquén é oferecer palavra que nenhum
+  // cliente dela escreve.
+  const sugestoes = palavrasDePassagemPadrao(useIdioma());
   const [draft, setDraft] = React.useState("");
 
   function add(kw: string) {
@@ -77,7 +81,7 @@ export function HandoffKeywordsInput({ value, onChange, disabled }: Props) {
         </button>
       </div>
       <div className="flex flex-wrap gap-1">
-        {DEFAULTS.filter((d) => !value.includes(d)).map((d) => (
+        {sugestoes.filter((d) => !value.includes(d)).map((d) => (
           <button
             key={d}
             type="button"
