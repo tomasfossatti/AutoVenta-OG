@@ -16114,6 +16114,10 @@ export const DICIONARIO: Traducoes = {
   "Nova organização": { es: "Nueva organización" },
   "Dados da organização": { es: "Datos de la organización" },
   "Criar organização": { es: "Crear organización" },
+  "Nome da agência": { es: "Nombre de la agencia" },
+  "Já existe uma organização com esse nome. Use outro.": { es: "Ya existe una organización con ese nombre. Usá otro." },
+  "Use um nome com pelo menos uma letra ou número.": { es: "Usá un nombre con al menos una letra o un número." },
+  "Autos del Sur": { es: "Autos del Sur" },
 
   // Meet: estados, falhas e ações da agenda e mensagem transacional.
   "Google Meet": { es: "Google Meet" },
