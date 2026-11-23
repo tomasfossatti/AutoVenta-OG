@@ -11,7 +11,11 @@ import { createClient } from "@/lib/supabase/server";
  *
  * Quem tem sessão segue direto para o painel, como sempre foi. Quem não tem vê
  * uma página que diz o que o produto é e leva à política de privacidade e aos
- * termos — sem pedir login. A verificação de um app que pede dados de conta
+ * termos — sem pedir login.
+ *
+ * Fork AutoVenta: o texto fala com o dono da concessionária (estoque, usado na
+ * troca, avaliação, sinal), e não do CRM genérico. O parágrafo do Google fica:
+ * é o que o revisor da verificação procura. A verificação de um app que pede dados de conta
  * Google exige exatamente isso: o revisor abre o endereço principal sem entrar e
  * precisa ver o nome do produto, o que ele faz e o link da política.
  *
@@ -49,25 +53,50 @@ export default async function HomePage() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-3xl space-y-6 px-6 py-12">
+      <main className="mx-auto w-full max-w-3xl space-y-8 px-6 py-12">
         <div className="space-y-3">
           <h1 className="text-3xl font-semibold tracking-tight">{marca.nome}</h1>
           <p className="text-lg text-muted-foreground">
-            {t("Atendimento e vendas pelo WhatsApp, com agentes de inteligência artificial.")}
+            {t("O agente de IA que atende o WhatsApp da sua concessionária.")}
           </p>
         </div>
 
         <p className="leading-relaxed">
-          {t("O")} {marca.nome}{" "}
           {t(
-            "reúne em um só lugar as conversas com os clientes, o funil de vendas, a agenda de atendimentos e agentes de inteligência artificial que respondem, qualificam o interesse e passam a conversa para uma pessoa quando é preciso.",
+            "Responde na hora com o seu estoque real de 0 km e usados: preço, fotos, quilometragem e disponibilidade. Quando a consulta está pronta para fechar, passa a conversa para o vendedor, com tudo registrado.",
           )}
         </p>
 
-        <p className="leading-relaxed">
-          {t("Quando a empresa conecta o Google Agenda, o")} {marca.nome}{" "}
+        <ul className="space-y-4">
+          <li className="rounded-lg border bg-background p-4">
+            <p className="font-medium">{t("Estoque em dia")}</p>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              {t(
+                "Você cadastra ou importa as unidades por planilha, e o agente só oferece o que está disponível. Unidade com sinal deixa de ser oferecida.",
+              )}
+            </p>
+          </li>
+          <li className="rounded-lg border bg-background p-4">
+            <p className="font-medium">{t("Usado na troca e avaliação")}</p>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              {t(
+                "O agente junta os dados do usado que o cliente quer entregar e pede a avaliação à equipe. O valor é sempre dado por uma pessoa, nunca inventado pela IA.",
+              )}
+            </p>
+          </li>
+          <li className="rounded-lg border bg-background p-4">
+            <p className="font-medium">{t("Cada operação no funil")}</p>
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              {t(
+                "Da primeira consulta ao sinal e à entrega: cada vendedor vê em que ponto está cada cliente.",
+              )}
+            </p>
+          </li>
+        </ul>
+
+        <p className="text-sm leading-relaxed text-muted-foreground">
           {t(
-            "mostra a ocupação da agenda e cria, altera e cancela os agendamentos pedidos pela própria pessoa. Quando conecta o Google Ads, devolve ao anúncio as vendas que ele trouxe. O uso dos dados do Google está descrito na",
+            "Se a concessionária conecta o Google Agenda, o sistema mostra a agenda e cria, altera e cancela os horários que o cliente pede. Se conecta o Google Ads, devolve ao anúncio as vendas que ele trouxe. O uso dos dados do Google está descrito na",
           )}{" "}
           <Link href="/legal/privacy#dados-do-google" className="underline underline-offset-2">
             {t("Política de Privacidade")}

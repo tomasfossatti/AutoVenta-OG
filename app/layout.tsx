@@ -22,6 +22,8 @@ import {
   type MarcaResolvida,
 } from "@/lib/branding/resolve";
 import { env } from "@/lib/env";
+import { traduzir } from "@/lib/i18n/dicionario";
+import { idiomaDoVisitante } from "@/lib/i18n/idiomaAnonimo";
 import { logger } from "@/lib/logger";
 import { ThemeProvider } from "@/lib/theme";
 import { Providers } from "./providers";
@@ -98,16 +100,22 @@ async function marcaResolvida(): Promise<{
 export async function generateMetadata(): Promise<Metadata> {
   const { linha, marca } = await marcaResolvida();
   const { name } = marca;
+  // Fork AutoVenta: a aba e a prévia do link no idioma de quem chega — o da
+  // instalação (`APP_LOCALE`) antes do navegador, como o corpo das telas
+  // públicas. Era pt-BR fixo, e a prévia no WhatsApp saía em português.
+  const idioma = await idiomaDoVisitante(null);
+  const t = (texto: string) => traduzir(texto, idioma);
   return {
     title: {
-      default: `${name} — atendimento e vendas por WhatsApp com agentes de IA`,
+      default: `${name} — ${t("atendimento e vendas por WhatsApp para concessionárias")}`,
       template: `%s · ${name}`,
     },
-    description:
-      "Centralize o atendimento por WhatsApp num funil só. Agentes de IA resolvem o que dá pra resolver e passam para o time humano o que importa — com tudo registrado. Multi-tenant, LGPD-nativo, feito para operações brasileiras.",
+    description: t(
+      "O agente de IA que atende o WhatsApp da sua concessionária com o seu estoque real, junta os dados do usado para a avaliação e passa ao vendedor a consulta pronta para fechar.",
+    ),
     applicationName: name,
     authors: [{ name }],
-    keywords: ["CRM", "atendimento", "WhatsApp", "IA conversacional", "LGPD", "multi-tenant"],
+    keywords: ["CRM", "concesionaria", "WhatsApp", "IA", "0 km", "usados"],
     robots: { index: false, follow: false },
     // Sem esta linha o navegador pede `/favicon.ico`, que não existe: medido em
     // produção, o 404 é a `app/not-found.tsx` INTEIRA (19.435 bytes de HTML)
@@ -335,7 +343,9 @@ async function MarcaDosClientComponents({ children }: { children: React.ReactNod
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
-      lang="pt-BR"
+      // Fork AutoVenta: o idioma da instalação (`APP_LOCALE=es`). Com `pt-BR`
+      // fixo o Chrome oferecia "traduzir do português" numa tela em espanhol.
+      lang={process.env.APP_LOCALE?.trim() || "pt-BR"}
       data-theme="light"
       suppressHydrationWarning
       // As famílias da tela Aparência só DECLARAM custom properties aqui

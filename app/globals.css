@@ -60,16 +60,20 @@
 
   /* Accent — Sage (11 stops) */
   --color-accent-50: #f0f5ff;
-  --color-accent-100: #e1ebff;
-  --color-accent-200: #c5d9ff;
-  --color-accent-300: #9ebfff;
-  --color-accent-400: #7aa6ff;
-  --color-accent-500: #598fff;
-  --color-accent-600: #3874f9;
-  --color-accent-700: #2e5cc0;
-  --color-accent-800: #274a96;
-  --color-accent-900: #223e79;
-  --color-accent-950: #0a1a3d;
+  --color-accent-100: #dfeaff;
+  --color-accent-200: #bfd5ff;
+  --color-accent-300: #94b9ff;
+  --color-accent-400: #6b9dff;
+  --color-accent-500: #4581ff;
+  /* Fork AutoVenta: la rampa nace de #2765ed, el azul de la marca (#3874f9)
+   * un poco más profundo. Con #3874f9 el blanco del botón daba 4,2:1 y el piso
+   * de texto es 4,5:1; con #2765ed da 5,0:1, y como texto de enlace pasa sobre
+   * los tres fondos claros. El logo sigue en #3874f9 (lib/branding/desenho.ts). */
+  --color-accent-600: #2765ed;
+  --color-accent-700: #2251b7;
+  --color-accent-800: #1f4391;
+  --color-accent-900: #1c3975;
+  --color-accent-950: #091a3d;
 
   /* Fork AutoVenta: el naranja de la marca, para microdetalles DECORATIVOS
    * (la barrita del ítem abierto en la barra lateral). No va en el anillo de
@@ -399,16 +403,16 @@
 
   /* Accent stays same hex stops; default shifts up for dark contrast */
   --color-accent-50: #f0f5ff;
-  --color-accent-100: #e1ebff;
-  --color-accent-200: #c5d9ff;
-  --color-accent-300: #9ebfff;
-  --color-accent-400: #7aa6ff;
-  --color-accent-500: #598fff;
-  --color-accent-600: #3874f9;
-  --color-accent-700: #2e5cc0;
-  --color-accent-800: #274a96;
-  --color-accent-900: #223e79;
-  --color-accent-950: #0a1a3d;
+  --color-accent-100: #dfeaff;
+  --color-accent-200: #bfd5ff;
+  --color-accent-300: #94b9ff;
+  --color-accent-400: #6b9dff;
+  --color-accent-500: #4581ff;
+  --color-accent-600: #2765ed;
+  --color-accent-700: #2251b7;
+  --color-accent-800: #1f4391;
+  --color-accent-900: #1c3975;
+  --color-accent-950: #091a3d;
   --color-accent: var(--color-accent-400);
   --color-accent-fg: #161510;
   --color-accent-soft: rgba(130, 160, 119, 0.16);

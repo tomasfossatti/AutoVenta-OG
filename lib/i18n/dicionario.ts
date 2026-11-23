@@ -51,6 +51,7 @@ import { TEXTOS_AVISOS_DA_CENTRAL } from "./avisos-da-central";
 import { TEXTOS_AUTOVENTA_VEHICULO } from "./autoventa-vehiculo";
 import { TEXTOS_AUTOVENTA_TASACION } from "./autoventa-tasacion";
 import { TEXTOS_AUTOVENTA_SENA } from "./autoventa-sena";
+import { TEXTOS_AUTOVENTA_PUBLICO } from "./autoventa-publico";
 
 /** `pt-BR` não aparece: é a chave. Só o que DIFERE precisa de linha. */
 type Traducoes = Record<string, Partial<Record<Exclude<Idioma, "pt-BR">, string>>>;
@@ -59,6 +60,7 @@ export const DICIONARIO: Traducoes = {
   ...TEXTOS_AUTOVENTA_VEHICULO,
   ...TEXTOS_AUTOVENTA_TASACION,
   ...TEXTOS_AUTOVENTA_SENA,
+  ...TEXTOS_AUTOVENTA_PUBLICO,
   ...TEXTOS_PAINEL_GOOGLE_ADS,
   ...TEXTOS_CONTRATACAO,
   ...TEXTOS_MCP_AGENTES,
