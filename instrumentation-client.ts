@@ -3,9 +3,13 @@
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/
 
 import * as Sentry from "@sentry/nextjs";
+import { zodEnEspanol } from "./lib/i18n/zod-en-espanol";
 import { resolveSentryDsn, isCommunityDsn, integracoesDoCliente } from "./lib/sentry/dsn";
 import { opcoesDePrivacidade } from "./lib/sentry/privacidade";
 import { integracoesDeReplay, pararReplayEmRotaComCredencial } from "./lib/sentry/replay";
+
+// Fork AutoVenta: mensajes de validación de Zod en español, también en el navegador.
+zodEnEspanol();
 
 const sentryDsn = resolveSentryDsn(
   typeof window !== "undefined" ? window.__PUBLIC_ENV__?.SENTRY_DSN : undefined,

@@ -1,3 +1,4 @@
+import { zodEnEspanol } from "@/lib/i18n/zod-en-espanol";
 import { disporJobAposFalha } from "./dispor-job-apos-falha";
 import { createApprovedReplyHandler } from "@/lib/agent-engine/agent/approved-reply";
 import { turnKnobsFromEnv } from "@/lib/agent-engine/agent/turn-knobs";
@@ -141,6 +142,9 @@ import {
   type JobKind,
   type JobRow,
 } from "@/lib/agent-engine/queue/queue";
+
+// Fork AutoVenta: mensajes de validación de Zod en español (`lib/i18n/zod-en-espanol.ts`).
+zodEnEspanol();
 
 export interface JobHandlerContext {
   workerId: string;

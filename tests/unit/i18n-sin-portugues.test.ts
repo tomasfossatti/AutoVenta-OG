@@ -15,6 +15,9 @@
  *
  * Arreglo: una línea en `lib/i18n/autoventa-completo-es.ts`, con voseo.
  */
+import { execSync } from "node:child_process";
+import { readFileSync } from "node:fs";
+
 import { describe, expect, it } from "vitest";
 
 import { traduzir } from "@/lib/i18n/dicionario";
@@ -83,6 +86,36 @@ describe("el producto en español no muestra portugués", () => {
       .flatMap((sitio) => sitio.valores.map((valor) => ({ sitio, valor })))
       .filter(({ valor }) => suenaAPortugues(traduzir(valor, "es")))
       .map(({ sitio, valor }) => `${valor}  ←  ${sitio.local}`)
+      .sort();
+    expect(enPortugues).toEqual([]);
+  });
+});
+
+describe("los mensajes de error de la API, con APP_LOCALE=es, no salen en portugués", () => {
+  // `fail()` traduce el mensaje con el idioma de la instalación
+  // (`lib/api/wrappers.ts`). Acá se recorren los mensajes escritos directo en
+  // `fail("codigo", "mensaje", …)`.
+  const archivos = execSync("git ls-files 'app/api/**/*.ts' 'lib/**/*.ts'", { encoding: "utf8" })
+    .trim()
+    .split("\n")
+    .filter((f) => !/\.test\.tsx?$/.test(f));
+  const LITERAL = /fail\(\s*["'`][a-z_]+["'`]\s*,\s*"((?:[^"\\]|\\.)+)"/g;
+  const mensajes = new Map<string, string>();
+  for (const archivo of archivos) {
+    for (const m of readFileSync(archivo, "utf8").matchAll(LITERAL)) {
+      mensajes.set(JSON.parse(`"${m[1]}"`) as string, archivo);
+    }
+  }
+
+  it("la recorrida encuentra los mensajes (control positivo)", () => {
+    expect(mensajes.size).toBeGreaterThan(400);
+    expect(mensajes.has("Canal não encontrado.")).toBe(true);
+  });
+
+  it("ningún mensaje literal de fail() sale en portugués", () => {
+    const enPortugues = [...mensajes]
+      .filter(([mensaje]) => suenaAPortugues(traduzir(mensaje, "es")))
+      .map(([mensaje, archivo]) => `${mensaje}  ←  ${archivo}`)
       .sort();
     expect(enPortugues).toEqual([]);
   });
