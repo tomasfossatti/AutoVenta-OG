@@ -36,7 +36,14 @@ export function WelcomeForm({ defaultOrgName, orgId }: { defaultOrgName: string;
   return (
     <form
       className="space-y-5 rounded-lg border bg-background p-6"
-      action={(formData) => {
+      // `onSubmit` con `preventDefault`, y no `action`: React 19 reinicia el
+      // formulario después de un `action`, y en un grupo de radios controlados
+      // no vuelve a marcar el elegido. Con el error `organization_changed` la
+      // persona perdía el rubro que había marcado (fork AutoVenta: el rubro es
+      // un radio; en el upstream era un campo de texto, que sí se restaura).
+      onSubmit={(event) => {
+        event.preventDefault();
+        const formData = new FormData(event.currentTarget);
         if (!accepted) {
           toast.error(t("Aceite os termos para continuar."));
           return;
