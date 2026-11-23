@@ -17,8 +17,10 @@ services:
         # Mesmo teto do Dockerfile por padrão; 6144 é o que o CI usa quando o
         # type check do `next build` passa de 4 GB (#4390, #4832).
         NODE_HEAP_MB: ${NODE_HEAP_MB:-4096}
-    image: deskcomm-app:local
-    pull_policy: never
+    # Sem APP_IMAGE no .env.local, usa o build local (plano B). Com ele,
+    # a imagem publicada pelo CI (tag sha-<7>, imutável → pull_policy missing).
+    image: ${APP_IMAGE:-deskcomm-app:local}
+    pull_policy: ${APP_PULL_POLICY:-never}
     restart: unless-stopped
     env_file: ${LOCAL_ENV_FILE:-.env.local}
     environment:
@@ -47,8 +49,10 @@ services:
       dockerfile: Dockerfile.worker
       args:
         APP_VERSION: ${APP_VERSION:-local}
-    image: deskcomm-worker:local
-    pull_policy: never
+    # Sem WORKER_IMAGE no .env.local, usa o build local (plano B). Com ele,
+    # a imagem publicada pelo CI (tag sha-<7>, imutável → pull_policy missing).
+    image: ${WORKER_IMAGE:-deskcomm-worker:local}
+    pull_policy: ${WORKER_PULL_POLICY:-never}
     restart: unless-stopped
     env_file: ${LOCAL_ENV_FILE:-.env.local}
     environment:
@@ -78,8 +82,10 @@ services:
       dockerfile: Dockerfile.scheduler
       args:
         APP_VERSION: ${APP_VERSION:-local}
-    image: deskcomm-scheduler:local
-    pull_policy: never
+    # Sem SCHEDULER_IMAGE no .env.local, usa o build local (plano B). Com ele,
+    # a imagem publicada pelo CI (tag sha-<7>, imutável → pull_policy missing).
+    image: ${SCHEDULER_IMAGE:-deskcomm-scheduler:local}
+    pull_policy: ${SCHEDULER_PULL_POLICY:-never}
     restart: unless-stopped
     env_file: ${LOCAL_ENV_FILE:-.env.local}
     environment:
