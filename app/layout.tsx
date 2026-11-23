@@ -163,9 +163,9 @@ export const viewport: Viewport = {
   interactiveWidget: "resizes-content",
 };
 
-// Inline FOUC-prevention. Conteúdo é string literal estática (zero input do usuário),
-// portanto seguro. Lê localStorage + prefers-color-scheme antes do primeiro paint.
-const THEME_INIT_SCRIPT = `(function(){try{var s=localStorage.getItem('deskcomm-theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var r=(s==='dark'||s==='light')?s:((s==='system'||!s)&&d?'dark':'light');document.documentElement.setAttribute('data-theme',r);}catch(e){document.documentElement.setAttribute('data-theme','light');}})();`;
+// AutoVenta tiene solo modo claro (ver `lib/theme.tsx`): fija `light` antes del
+// primer paint y borra la preferencia que haya quedado de cuando existía el oscuro.
+const THEME_INIT_SCRIPT = `(function(){document.documentElement.setAttribute('data-theme','light');try{localStorage.removeItem('deskcomm-theme');}catch(e){}})();`;
 
 /**
  * Motivos já registrados neste processo. `EstiloDaMarca` roda em TODA

@@ -1457,13 +1457,7 @@ const CHAVE_DE_RUNTIME_CONGELADA: { arquivo: string; expressao: string; motivo: 
       "erro que lista os itens sem preço devolvidos pelo banco: a lista é dado de runtime, e a frase " +
       "montada serve só à rota que dispara o envio",
   },
-  {
-    arquivo: "components/theme/theme-toggle.tsx",
-    expressao: "`Tema: ${theme}. Cmd+Shift+L para alternar.`",
-    motivo:
-      "aria-label do alternador de tema montado com o nome do tema em runtime — tela de produto, e o " +
-      "conserto (literal em cada ramo, claro/escuro) é decisão de produto declarada na issue #603",
-  },
+
   {
     arquivo: "app/api/v1/ai/jev/route.ts",
     expressao: "soObserva",
@@ -1675,16 +1669,10 @@ describe("chave construída em runtime: t() não recebe o que o código não esc
       "nenhuma variável resolveu pelo passo 1: o cruzamento parou de achar const de topo",
     ).toBeGreaterThan(0);
     expect(
-      varredura.sitios.find(
-        (s) =>
-          s.forma === "template" && s.arquivo === "components/theme/theme-toggle.tsx",
-      ),
-      "o sítio t(`Tema: ${theme}…`) saiu de components/theme/theme-toggle.tsx",
-    ).toBeDefined();
-    expect(
       varredura.sitios.filter((s) => s.forma === "template").length,
       "template com interpolação deixou de ser forma de runtime",
-    ).toBeGreaterThanOrEqual(5);
+      // 4 desde que AutoVenta quitó el alternador de tema (solo modo claro).
+    ).toBeGreaterThanOrEqual(4);
   });
 
   it("nenhuma chave construída em runtime passa por t() fora da dívida congelada", () => {
