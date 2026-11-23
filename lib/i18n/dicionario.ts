@@ -35,6 +35,7 @@ import { TEXTOS_CADENCIAS } from "./cadencias";
 import { TEXTOS_CADENCIAS_ORIGINAIS } from "./cadencias-originais";
 import { entradaDoCatalogo } from "./catalogos";
 import { TEXTOS_RIOPLATENSES } from "./rioplatense";
+import { TEXTOS_COMPLETADOS_ES } from "./autoventa-completo-es";
 import type { Idioma } from "./idiomas";
 import { TEXTOS_AGENDA_CONFIGURACAO } from "./agenda-configuracao";
 import { TEXTOS_AGENDA_SERVICOS } from "./agenda-servicos";
@@ -22960,5 +22961,11 @@ export function traduzir(texto: string, idioma: Idioma): string {
     const rioplatense = TEXTOS_RIOPLATENSES[texto];
     if (rioplatense !== undefined) return rioplatense;
   }
-  return DICIONARIO[texto]?.[idioma] ?? entradaDoCatalogo(idioma, texto) ?? texto;
+  return (
+    DICIONARIO[texto]?.[idioma] ??
+    // Fork AutoVenta: lo que el upstream todavía no tradujo (`./autoventa-completo-es`).
+    (idioma === "es" ? TEXTOS_COMPLETADOS_ES[texto] : undefined) ??
+    entradaDoCatalogo(idioma, texto) ??
+    texto
+  );
 }
