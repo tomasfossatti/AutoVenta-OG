@@ -16,7 +16,9 @@
  * runtime em vez de lida do bundle.
  */
 
-export const DEFAULT_APP_NAME = "DeskcommCRM";
+// Fork AutoVenta: o produto deste fork é a AutoVenta, e é esta a marca de
+// fábrica de toda instalação dele (o desenho está em `lib/branding/desenho.ts`).
+export const DEFAULT_APP_NAME = "AutoVenta";
 
 export type Branding = {
   /** Nome exibido na interface e nos títulos de página. */

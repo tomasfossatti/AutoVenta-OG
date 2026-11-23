@@ -4,6 +4,8 @@
  */
 import { z } from "zod";
 
+import { PROVINCIAS_ARGENTINAS, PROVINCIA_PADRAO } from "@/lib/onboarding/datos-de-concesionaria";
+
 export const welcomeSchema = z.object({
   display_name: z.string().min(2).max(120),
   /**
@@ -20,6 +22,8 @@ export const welcomeSchema = z.object({
    * o próprio negócio em uma linha. Quem pula recebe o quadro genérico.
    */
   o_que_faz: z.string().max(280).optional(),
+  /** Fork AutoVenta: a província da agência. Entra no prompt do agente. */
+  provincia: z.enum(PROVINCIAS_ARGENTINAS).default(PROVINCIA_PADRAO),
   timezone: z.string().min(1).default("America/Sao_Paulo"),
   accepted_terms_at: z.string().datetime().optional(),
 });
@@ -66,6 +70,8 @@ export const onboardingStateSchema = z.object({
       display_name: z.string(),
       /** O ramo, na palavra do dono. Alimenta o prompt e o quadro de clientes. */
       o_que_faz: z.string().optional(),
+      /** Fork AutoVenta: a província da agência (`datos-de-concesionaria.ts`). */
+      provincia: z.string().optional(),
     })
     .optional(),
   whatsapp: z

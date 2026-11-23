@@ -58,7 +58,8 @@ const FIXTURE = [
 describe("extrairRegua — os pares saem do globals.css, nunca de lista à mão", () => {
   it("acha os dois temas, a rampa do produto e os neutros", () => {
     expect(REGUA.rampaDoProduto).toHaveLength(11);
-    expect(REGUA.rampaDoProduto[6]).toBe("#506d48");
+    // Fork AutoVenta: a rampa do produto nasce do celeste da marca.
+    expect(REGUA.rampaDoProduto[6]).toBe("#3874f9");
     expect(REGUA.claro.neutros).toHaveLength(11);
     expect(REGUA.escuro.neutros[9]).toBe("#161510");
     expect(REGUA.claro.base.map((b) => b.chave)).toEqual([
@@ -75,7 +76,9 @@ describe("extrairRegua — os pares saem do globals.css, nunca de lista à mão"
     const foco = REGUA.claro.papeis.find((p) => p.token.includes(":focus-visible"));
     expect(foco, "o anel de foco sumiu da régua").toBeDefined();
     expect(foco?.tipo).toBe("componente");
-    expect(foco?.fonte).toMatchObject({ tipo: "grau", indice: 5 });
+    // Fork AutoVenta: no claro o anel é `accent-600` — o 500 da rampa celeste dava
+    // 2,88 contra `#f7f7f7`, abaixo do piso 3,0 (`app/globals.css`).
+    expect(foco?.fonte).toMatchObject({ tipo: "grau", indice: 6 });
 
     const focoEscuro = REGUA.escuro.papeis.find((p) => p.token.includes(":focus-visible"));
     expect(focoEscuro?.fonte).toMatchObject({ tipo: "grau", indice: 4 });
@@ -119,9 +122,11 @@ describe("extrairRegua — os pares saem do globals.css, nunca de lista à mão"
     const razao = (papel: string, superficie: string) =>
       pares.find((p) => p.papel === papel && p.superficie === superficie)?.razao ?? 0;
 
-    expect(razao("--color-accent", "--color-bg")).toBeCloseTo(5.51, 2);
-    expect(razao(":focus-visible/outline", "--color-bg")).toBeCloseTo(3.79, 2);
-    expect(razao(":focus-visible/outline", "--color-surface-elevated")).toBeCloseTo(3.6, 2);
+    // Fork AutoVenta: medidos com a paleta celeste (`#3874f9` sobre `#f7f7f7` e
+    // `#f3f3f3`). Accent e anel são o mesmo grau (600), daí o mesmo número.
+    expect(razao("--color-accent", "--color-bg")).toBeCloseTo(3.89, 2);
+    expect(razao(":focus-visible/outline", "--color-bg")).toBeCloseTo(3.89, 2);
+    expect(razao(":focus-visible/outline", "--color-surface-elevated")).toBeCloseTo(3.76, 2);
   });
 
   it("a Sage inteira, como está no CSS, cabe nos pisos", () => {
@@ -224,13 +229,13 @@ describe("derivarMarca — as 16 sementes adversariais", () => {
         .map((t) => `${semente}/${t.deslocamento}`),
     );
     expect(deslocados.length).toBeGreaterThan(0);
-    expect(deslocados).toHaveLength(13);
+    expect(deslocados).toHaveLength(11); // Fork AutoVenta: medido com a régua celeste.
 
     // O amarelo é o caso que NÃO tem escapatória física: nenhum stop claro de amarelo
     // alcança 3:1 contra `#ffffff`. Se ele parar de andar, a caminhada quebrou.
     const amarelo = resultados.find((r) => r.semente === "#f5c518")!.marca;
     expect(amarelo.claro.deslocamento).toBeGreaterThan(0);
-    expect(amarelo.claro.grauDoAccent).toBe(900);
+    expect(amarelo.claro.grauDoAccent).toBe(800); // Fork AutoVenta: com o fundo #f7f7f7.
     // …e o hex EXATO do cliente reaparece como accent do tema escuro.
     expect(amarelo.escuro.accent).toBe("#f5c518");
   });
@@ -307,9 +312,9 @@ describe("reconciliação — quem se move são as NOSSAS semânticas", () => {
     // `--color-success` do bloco escuro é `#82a077`, a MESMA string de
     // `--color-accent-400` (globals.css:167 e :193). Δ = 0,0°. Se o mecanismo não
     // disparasse aqui, ele não dispararia em lugar nenhum.
-    expect(REGUA.escuro.semanticas.find((s) => s.nome === "success")?.hex).toBe(
-      REGUA.rampaDoProduto[4],
-    );
+    // Fork AutoVenta: a rampa do produto agora é celeste, e o `#82a077` do
+    // success escuro deixou de ser um stop dela. A colisão segue existindo para
+    // a semente Sage, e é ela que este controle usa de propósito.
 
     const sage = derivarMarca("#506d48", REGUA);
     const movidas = sage.motivos.filter((m) => m.codigo === "semantica_deslocada");
@@ -375,8 +380,8 @@ describe("reconciliação — quem se move são as NOSSAS semânticas", () => {
         }
       }
     }
-    // Guarda de vacuidade do run inteiro: 23 movimentos medidos nas 16 sementes.
-    expect(movimentosNoRun).toBe(23);
+    // Guarda de vacuidade do run inteiro: 15 movimentos medidos nas 16 sementes. (Fork AutoVenta: régua celeste.)
+    expect(movimentosNoRun).toBe(15);
   });
 });
 
@@ -411,9 +416,11 @@ describe("marca acromática — o accent do produto permanece", () => {
     // escuro (accent-400 × neutral-400). São eles que mostram por que o piso do briefing
     // (8, na convenção ×100 — ou seja 0,08 aqui) não podia ser aceito sem medir: ele
     // reprovaria o controle positivo do próprio produto no tema claro.
-    expect(separacaoDoNeutro(REGUA.claro, marca.claro.grauDoAccent, marca.claro.accent)).toBeCloseTo(0.0681, 4);
-    expect(separacaoDoNeutro(REGUA.escuro, marca.escuro.grauDoAccent, marca.escuro.accent)).toBeCloseTo(0.1994, 4);
-    expect(separacaoDoNeutro(REGUA.claro, marca.claro.grauDoAccent, marca.claro.accent)).toBeLessThan(0.08);
+    //
+    // Fork AutoVenta: com os neutros frios da AutoVenta (cinza puro) o cinza da
+    // semente separa bem mais dos neutros: 0,2729 no claro e 0,2941 no escuro.
+    expect(separacaoDoNeutro(REGUA.claro, marca.claro.grauDoAccent, marca.claro.accent)).toBeCloseTo(0.2729, 4);
+    expect(separacaoDoNeutro(REGUA.escuro, marca.escuro.grauDoAccent, marca.escuro.accent)).toBeCloseTo(0.2941, 4);
 
     // Controle negativo: um accent cinza reprovaria as duas guardas. Sem esta linha, os
     // pisos acima poderiam ser satisfeitos por qualquer coisa.

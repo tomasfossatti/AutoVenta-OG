@@ -95,10 +95,12 @@ export default async function Icon() {
           }}
         >
           <svg viewBox={SIMBOLO.viewBox} width={lado} height={lado}>
-            <g fill={CORES_DA_MARCA.claro.simbolo} transform={SIMBOLO.transform}>
-              <path d={SIMBOLO.d} />
-              <rect {...SIMBOLO.modulo} />
-            </g>
+            {SIMBOLO.azul.map((g) => (
+              <path key={g.d} fill={CORES_DA_MARCA.claro.azul} transform={g.transform} d={g.d} />
+            ))}
+            {SIMBOLO.naranja.map((g) => (
+              <path key={g.d} fill={CORES_DA_MARCA.claro.naranja} transform={g.transform} d={g.d} />
+            ))}
           </svg>
         </div>
       ),

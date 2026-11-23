@@ -403,6 +403,13 @@ export function SidebarContent({
                             collapsed && "justify-center px-2",
                           )}
                         >
+                          {/* Fork AutoVenta: el naranja de la marca marca el ítem abierto. */}
+                          {isActive && (
+                            <span
+                              aria-hidden
+                              className="absolute inset-y-1 left-0 w-1 rounded-full bg-[var(--color-detalle)]"
+                            />
+                          )}
                           <Icon size={18} weight={isActive ? "fill" : "regular"} aria-hidden />
                           {!collapsed && <span className="truncate">{t(item.label)}</span>}
                           {item.healthDot && (

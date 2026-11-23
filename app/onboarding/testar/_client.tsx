@@ -24,7 +24,9 @@ const EXEMPLO = "Oi! Vocês atendem hoje? Queria saber o preço.";
 
 export function TestarClient({ nome, agenteId, versaoId }: Props) {
   const t = useT();
-  const [mensagem, setMensagem] = useState(EXEMPLO);
+  // Traduzido: o exemplo era a única frase da tela que chegava em português
+  // para quem usa o produto em espanhol.
+  const [mensagem, setMensagem] = useState(() => t(EXEMPLO));
   const [desfecho, setDesfecho] = useState<Desfecho | null>(null);
   const [carregando, setCarregando] = useState(false);
   const [pending, startTransition] = useTransition();
