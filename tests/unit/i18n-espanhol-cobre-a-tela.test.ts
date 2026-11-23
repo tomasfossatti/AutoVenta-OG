@@ -1099,6 +1099,12 @@ const DADO_DO_OPERADOR_CONGELADO: { arquivo: string; expressao: string; motivo: 
     motivo: "rótulo do par de aparências que já sai traduzido na construção (linhas 419-420)",
   },
   {
+    arquivo: "lib/api/wrappers.ts",
+    expressao: "message",
+    motivo:
+      "fork AutoVenta: mensagem de erro de fail(), escrita pela ROTA (literal de código, não dado do operador); traduzida pelo idioma da instalação (APP_LOCALE). Dado digitado só muda se for idêntico a uma chave do dicionário",
+  },
+  {
     arquivo: "components/connections/CanalVozClient.tsx",
     expressao: "fallback",
     motivo:

@@ -454,4 +454,13 @@ export const TEXTOS_RIOPLATENSES: Readonly<Record<string, string>> = {
   "É o que o cliente lê quando o agente passa a conversa para uma pessoa. Deixe vazio para usar a frase padrão.": "Es lo que lee el cliente cuando el agente pasa la conversación a una persona. Dejalo vacío para usar la frase predeterminada.",
   "É por este número que ele vai atender seus clientes. Se você conecta pelo celular, tenha ele por perto.": "Va a atender a tus clientes con este número. Si conectás desde el celular, tenelo cerca.",
   "•••• (já guardado — preencha para trocar)": "•••• (ya guardado; escribí uno nuevo para reemplazarlo)",
+  // Fork AutoVenta (2026-11-22): traducciones del diccionario que dejaban portugués en pantalla.
+  "Nome: Cobrança do sistema": "Nombre: Cobro del sistema",
+  "Arquivo não informado.": "No se indicó el archivo.",
+  "Ex.: São Paulo, SP": "Ej.: Neuquén, Neuquén",
+  "Use [nome da empresa] e [seu nome]: na ligação, eles viram o nome do lead e o seu.": "Usá [nombre del negocio] y [tu nombre]: en la llamada se reemplazan por el nombre del lead y el tuyo.",
+  "Use # para títulos, [Marca] no começo da fala para a situação, e as lacunas [nome do negócio] e [seu nome].": "Usá # para los títulos, [Marca] al principio de la frase para indicar la situación, y los espacios [nombre del negocio] y [tu nombre].",
+  "O gasto de IA deste mês chegou a {gasto} de um limite de {teto} ({pct}%), e você escolheu que a IA parasse ao chegar nele. As conversas que estavam sendo atendidas foram para a FILA DE ATENDIMENTO HUMANO — ninguém ficou sem próximo passo, mas alguém precisa responder. Aumentar o limite ou desligar a parada em Uso de IA › Orçamento evita paradas NOVAS; cada conversa já parada volta ao automático pelo botão \"Devolver ao automático\" no cabeçalho dela.": "El gasto en IA de este mes llegó a {gasto} de un límite de {teto} ({pct}%), y elegiste que la IA se detuviera al alcanzarlo. Las conversaciones que se estaban atendiendo pasaron a la COLA DE ATENCIÓN HUMANA: nadie se quedó sin un próximo paso, pero alguien tiene que responder. Subir el límite o desactivar la detención en Uso de IA › Presupuesto evita NUEVAS detenciones; cada conversación ya detenida vuelve al modo automático con el botón \"Devolver al automático\" de su encabezado.",
+  "Body JSON inválido.": "Cuerpo JSON inválido.",
+  "Query inválida.": "Consulta inválida.",
 };

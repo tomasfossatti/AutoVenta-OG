@@ -14,6 +14,8 @@ import { randomUUID } from "node:crypto";
 import { requestIdJaLogado } from "@/lib/log/request-id-logado";
 import { logger } from "@/lib/logger";
 import type { ApiErrorCode } from "@/lib/api/errors";
+import { idiomaDaInstalacao } from "@/lib/email/idioma-do-email";
+import { traduzir } from "@/lib/i18n/dicionario";
 
 // -----------------------------------------------------------------------------
 // Tipos públicos
@@ -75,7 +77,14 @@ export function fail(
   const body: ApiError = {
     error: {
       code,
-      message,
+      // Fork AutoVenta: el mensaje sale en el idioma de la INSTALACIÓN
+      // (`APP_LOCALE`). Unas 1.000 rutas escriben el mensaje directo, en
+      // portugués o en inglés, y la pantalla lo muestra tal cual; con
+      // `APP_LOCALE=es` pasa por el diccionario acá, en un solo lugar. Sin
+      // `APP_LOCALE` el idioma es `pt-BR` y `traduzir` devuelve el texto intacto:
+      // el comportamiento del upstream. Un mensaje que la ruta ya tradujo no
+      // es clave del diccionario y vuelve igual.
+      message: traduzir(message, idiomaDaInstalacao()),
       ...(opts.details !== undefined ? { details: opts.details } : {}),
     },
   };
