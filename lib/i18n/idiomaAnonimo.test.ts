@@ -3,7 +3,9 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 const cena = vi.hoisted(() => ({ acceptLanguage: null as string | null }));
 
 vi.mock("next/headers", () => ({
-  headers: async () => ({ get: (nome: string) => (nome === "accept-language" ? cena.acceptLanguage : null) }),
+  headers: async () => ({
+    get: (nome: string) => (nome === "accept-language" ? cena.acceptLanguage : null),
+  }),
 }));
 
 import { idiomaDoVisitante } from "./idiomaAnonimo";
