@@ -110,12 +110,13 @@ describe("rampaDeSemente — catraca de calibração contra o design system", ()
     // por não ter o que comparar — instrumento morto tem cara de teste verde.
     expect(esperados).toHaveLength(11);
     expect(new Set(esperados).size).toBe(11);
-    // Fork AutoVenta: a rampa do produto nasce do celeste da marca.
-    expect(esperados[K]).toBe("#3874f9");
+    // Fork AutoVenta: a rampa do produto nasce do azul da marca aprofundado
+    // (`#2765ed`), para o branco do botão passar 4,5:1.
+    expect(esperados[K]).toBe("#2765ed");
   });
 
-  it("reproduz os 11 stops do produto a partir de #3874f9 com Δ ≤ 2/255 por canal", () => {
-    const derivada = rampaDeSemente("#3874f9");
+  it("reproduz os 11 stops do produto a partir de #2765ed com Δ ≤ 2/255 por canal", () => {
+    const derivada = rampaDeSemente("#2765ed");
     const distancias = esperados.map((esperado, i) => distanciaPorCanal(esperado, derivada[i]!));
     expect(
       Math.max(...distancias),

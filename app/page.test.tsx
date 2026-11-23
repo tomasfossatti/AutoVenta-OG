@@ -36,7 +36,7 @@ describe("/ — a página inicial pública", () => {
     await montar();
 
     expect(screen.getByRole("heading", { level: 1, name: "Marca da Revenda" })).toBeInTheDocument();
-    expect(screen.getByText(/Atendimento e vendas pelo WhatsApp/)).toBeInTheDocument();
+    expect(screen.getByText(/atende o WhatsApp da sua concessionária/)).toBeInTheDocument();
 
     const politica = screen
       .getAllByRole("link", { name: "Política de Privacidade" })

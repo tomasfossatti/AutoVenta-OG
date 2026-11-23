@@ -31,7 +31,7 @@ import { lerCreds, loginComoAdmin } from "./helpers/login-admin";
 test.describe.configure({ timeout: 180_000 });
 
 /** O pedaço do título DEFAULT — se ele aparece, a página não declarou o seu. */
-const FRASE_DA_LANDING = "atendimento e vendas por WhatsApp com agentes de IA";
+const FRASE_DA_LANDING = "atendimento e vendas por WhatsApp para concessionárias";
 
 const TELAS: ReadonlyArray<readonly [string, string]> = [
   ["/app/inbox", "Inbox"],

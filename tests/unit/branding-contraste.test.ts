@@ -59,7 +59,7 @@ describe("extrairRegua — os pares saem do globals.css, nunca de lista à mão"
   it("acha os dois temas, a rampa do produto e os neutros", () => {
     expect(REGUA.rampaDoProduto).toHaveLength(11);
     // Fork AutoVenta: a rampa do produto nasce do celeste da marca.
-    expect(REGUA.rampaDoProduto[6]).toBe("#3874f9");
+    expect(REGUA.rampaDoProduto[6]).toBe("#2765ed");
     expect(REGUA.claro.neutros).toHaveLength(11);
     expect(REGUA.escuro.neutros[9]).toBe("#161510");
     expect(REGUA.claro.base.map((b) => b.chave)).toEqual([
@@ -122,11 +122,12 @@ describe("extrairRegua — os pares saem do globals.css, nunca de lista à mão"
     const razao = (papel: string, superficie: string) =>
       pares.find((p) => p.papel === papel && p.superficie === superficie)?.razao ?? 0;
 
-    // Fork AutoVenta: medidos com a paleta celeste (`#3874f9` sobre `#f7f7f7` e
-    // `#f3f3f3`). Accent e anel são o mesmo grau (600), daí o mesmo número.
-    expect(razao("--color-accent", "--color-bg")).toBeCloseTo(3.89, 2);
-    expect(razao(":focus-visible/outline", "--color-bg")).toBeCloseTo(3.89, 2);
-    expect(razao(":focus-visible/outline", "--color-surface-elevated")).toBeCloseTo(3.76, 2);
+    // Fork AutoVenta: medidos com o azul `#2765ed` (o `#3874f9` da marca mais
+    // profundo, para o branco do botão passar 4,5:1) sobre `#f7f7f7` e
+    // `#f3f3f3`. Accent e anel são o mesmo grau (600), daí o mesmo número.
+    expect(razao("--color-accent", "--color-bg")).toBeCloseTo(4.7, 2);
+    expect(razao(":focus-visible/outline", "--color-bg")).toBeCloseTo(4.7, 2);
+    expect(razao(":focus-visible/outline", "--color-surface-elevated")).toBeCloseTo(4.54, 2);
   });
 
   it("a Sage inteira, como está no CSS, cabe nos pisos", () => {
@@ -418,9 +419,9 @@ describe("marca acromática — o accent do produto permanece", () => {
     // reprovaria o controle positivo do próprio produto no tema claro.
     //
     // Fork AutoVenta: com os neutros frios da AutoVenta (cinza puro) o cinza da
-    // semente separa bem mais dos neutros: 0,2729 no claro e 0,2941 no escuro.
-    expect(separacaoDoNeutro(REGUA.claro, marca.claro.grauDoAccent, marca.claro.accent)).toBeCloseTo(0.2729, 4);
-    expect(separacaoDoNeutro(REGUA.escuro, marca.escuro.grauDoAccent, marca.escuro.accent)).toBeCloseTo(0.2941, 4);
+    // semente separa bem mais dos neutros: 0,2523 no claro e 0,2809 no escuro (rampa de `#2765ed`).
+    expect(separacaoDoNeutro(REGUA.claro, marca.claro.grauDoAccent, marca.claro.accent)).toBeCloseTo(0.2523, 4);
+    expect(separacaoDoNeutro(REGUA.escuro, marca.escuro.grauDoAccent, marca.escuro.accent)).toBeCloseTo(0.2809, 4);
 
     // Controle negativo: um accent cinza reprovaria as duas guardas. Sem esta linha, os
     // pisos acima poderiam ser satisfeitos por qualquer coisa.

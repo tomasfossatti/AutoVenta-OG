@@ -10,6 +10,8 @@ import { audit } from "@/lib/audit";
 import { createHash, randomUUID } from "node:crypto";
 import { lerPlano } from "@/lib/cobranca/dono";
 import { moduloLigado } from "@/lib/instalacao/modulos";
+import { perfilDaEmpresaDaInstalacao } from "@/lib/auth/perfil-da-empresa-da-instalacao";
+import { logger } from "@/lib/logger";
 import { querySchema, listarTenants } from "./_lista";
 
 // ---------------------------------------------------------------------------
@@ -166,6 +168,23 @@ export async function POST(req: NextRequest) {
     }
     return fail("internal_error", "Não foi possível criar a organização", 500, { requestId });
   }
+  // Fork AutoVenta: a empresa nasce no idioma, fuso e moeda da instalação
+  // (`lib/auth/perfil-da-empresa-da-instalacao.ts`). Antes do convite, que
+  // escolhe o idioma do e-mail pela organização.
+  const perfilDaInstalacao = org.created ? perfilDaEmpresaDaInstalacao(process.env.APP_LOCALE) : null;
+  if (perfilDaInstalacao) {
+    const { error: erroDoPerfil } = await admin
+      .from("organizations")
+      .update(perfilDaInstalacao)
+      .eq("id", org.id);
+    if (erroDoPerfil) {
+      logger.warn("tenant criado sem o idioma da instalação", {
+        requestId,
+        organizationId: org.id,
+        code: erroDoPerfil.code,
+      });
+    }
+  }
   if (org.created) {
     await audit({
       action: "tenant.created_by_platform_admin",
@@ -182,6 +201,7 @@ export async function POST(req: NextRequest) {
         plan: request.plan ?? null,
         plano_id: request.plano_id ?? null,
         creator_role: "admin",
+        perfil_da_instalacao: perfilDaInstalacao,
       },
     });
   }

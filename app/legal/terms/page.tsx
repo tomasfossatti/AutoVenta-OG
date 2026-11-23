@@ -1,13 +1,13 @@
-import type { Metadata } from "next";
-
 import { nomeDoOperador, resolverOperador } from "@/lib/legal/operador";
 import { createClient } from "@/lib/supabase/server";
 import { idiomaDoVisitante } from "@/lib/i18n/idiomaAnonimo";
 import { traduzir } from "@/lib/i18n/dicionario";
+import { tituloDaTelaPublica } from "@/lib/i18n/titulo-da-tela-publica";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = { title: "Termos de Uso" };
+// A aba no idioma do visitante, como o corpo (`lib/i18n/titulo-da-tela-publica.ts`).
+export const generateMetadata = () => tituloDaTelaPublica((t) => t("Termos de Uso"));
 
 export default async function TermsPage() {
   const op = await resolverOperador();
@@ -39,7 +39,7 @@ export default async function TermsPage() {
         <p>
           {t("O")} {op.sistema} {t("é um software de código aberto instalado e operado por")}{" "}
           <strong>{operador}</strong>
-          {op.cnpj ? ` (CNPJ ${op.cnpj})` : ""}, {t("daqui em diante")}{" "}
+          {op.cnpj ? ` (${(process.env.APP_LOCALE ?? "").trim().toLowerCase().startsWith("es") ? "CUIT" : "CNPJ"} ${op.cnpj})` : ""}, {t("daqui em diante")}{" "}
           <strong>{t("o operador")}</strong>.{" "}
           {t(
             "É o operador quem mantém este servidor, decide como o sistema é usado e responde pelos dados tratados aqui.",

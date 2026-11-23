@@ -1,14 +1,15 @@
-import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { nomeDoOperador, resolverOperador } from "@/lib/legal/operador";
 import { createClient } from "@/lib/supabase/server";
 import { idiomaDoVisitante } from "@/lib/i18n/idiomaAnonimo";
 import { traduzir } from "@/lib/i18n/dicionario";
+import { tituloDaTelaPublica } from "@/lib/i18n/titulo-da-tela-publica";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = { title: "Política de Privacidade" };
+// A aba no idioma do visitante, como o corpo (`lib/i18n/titulo-da-tela-publica.ts`).
+export const generateMetadata = () => tituloDaTelaPublica((t) => t("Política de Privacidade"));
 
 export default async function PrivacyPage() {
   const op = await resolverOperador();
@@ -39,7 +40,14 @@ export default async function PrivacyPage() {
   // Sem sessão ou com a coluna vazia vale o Brasil — o mesmo "vazio" da
   // coluna `organizations.country`. Cada ramo é um literal em `t()`: chave de
   // dicionário nas duas direções, nunca frase montada em runtime.
-  const ePortugal = (op.pais ?? "").trim().toUpperCase() === "PT";
+  const pais = (op.pais ?? "").trim().toUpperCase();
+  const ePortugal = pais === "PT";
+  // Fork AutoVenta: a Argentina cita a Lei 25.326. Vale para a organização com
+  // país AR e, sem país (visitante sem sessão, organização com a coluna
+  // vazia), para a instalação em espanhol — o fork só atende a Argentina, e
+  // cair no Brasil citava a LGPD a um titular argentino.
+  const eArgentina =
+    pais === "AR" || (pais === "" && (process.env.APP_LOCALE ?? "").trim().toLowerCase().startsWith("es"));
 
   return (
     <>
@@ -52,15 +60,21 @@ export default async function PrivacyPage() {
 
       <section className="space-y-2">
         <h2 className="text-base font-semibold">
-          {ePortugal ? t("1. Quem é o responsável pelo tratamento") : t("1. Quem é o controlador")}
+          {ePortugal
+            ? t("1. Quem é o responsável pelo tratamento")
+            : eArgentina
+              ? t("1. Quem é o responsável pela base de dados")
+              : t("1. Quem é o controlador")}
         </h2>
         <p>
           {ePortugal
             ? t("O responsável pelo tratamento dos dados tratados aqui é")
-            : t("O controlador dos dados tratados aqui é")}{" "}
+            : eArgentina
+              ? t("O responsável pela base de dados tratada aqui é")
+              : t("O controlador dos dados tratados aqui é")}{" "}
           <strong>{operador}</strong>
-          {op.cnpj ? ` (${ePortugal ? "NIPC" : "CNPJ"} ${op.cnpj})` : ""} —{" "}
-          {ePortugal
+          {op.cnpj ? ` (${ePortugal ? "NIPC" : eArgentina ? "CUIT" : "CNPJ"} ${op.cnpj})` : ""} —{" "}
+          {ePortugal || eArgentina
             ? t(
                 "quem instalou e opera este sistema. Os autores do software não têm acesso a este servidor nem aos dados guardados nele, e não são responsáveis pelo tratamento nem operadores desses dados.",
               )
@@ -140,7 +154,11 @@ export default async function PrivacyPage() {
             ? t(
                 "O RGPD garante-lhe confirmar se há tratamento, aceder aos seus dados, corrigir dados incompletos ou desatualizados, pedir anonimização ou eliminação, saber com quem foram partilhados e retirar o consentimento.",
               )
-            : t(
+            : eArgentina
+              ? t(
+                  "A Lei 25.326 de Proteção de Dados Pessoais garante a você acessar seus dados sem custo a cada seis meses, pedir que sejam retificados, atualizados ou suprimidos e revogar seu consentimento. A Agência de Acesso à Informação Pública (AAIP) é o órgão de controle da lei e recebe denúncias por descumprimento.",
+                )
+              : t(
                 "A LGPD garante a você confirmar se há tratamento, acessar seus dados, corrigir dados incompletos ou desatualizados, pedir anonimização ou eliminação, saber com quem foram compartilhados e revogar consentimento.",
               )}
         </p>
