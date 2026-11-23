@@ -35,13 +35,9 @@ function renderForm(locale: "pt-BR" | "es", initialLocale: "pt-BR" | "es") {
 }
 
 describe("ProfileForm em espanhol", () => {
-  it("hidrata o idioma salvo — não nasce em pt-BR", () => {
+  it("AutoVenta: no ofrece elegir idioma", () => {
     renderForm("es", "es");
-    // O Radix Select também espelha as opções num <select> nativo oculto (por
-    // acessibilidade), então "Español" aparece nele mesmo sem ser o valor
-    // selecionado — asserção tem que mirar o valor VISÍVEL do combobox, não o
-    // texto solto, senão a sabotagem (remover initialLocale) não reprova nada.
-    expect(screen.getByRole("combobox", { name: "Idioma" })).toHaveTextContent("Español");
+    expect(screen.queryByRole("combobox", { name: "Idioma" })).toBeNull();
   });
 
   it("com locale es, os rótulos vêm do dicionário", () => {

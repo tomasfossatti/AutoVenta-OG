@@ -41,7 +41,7 @@ const PISO = {
   passosComRota: 440,
   rotasUnicas: 125,
   rastersDeDestaque: 2888,
-  acoesAntes: 1979,
+  acoesAntes: 1975, // AutoVenta: −4 al sacar los pasos de idioma de perfil › idioma-e-fuso (2026-11-23)
   rolagensComAncora: 8,
   alvosConferidos: 3668,
   alvosEmDivida: 398,

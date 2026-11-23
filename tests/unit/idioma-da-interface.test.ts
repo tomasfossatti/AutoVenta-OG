@@ -165,21 +165,16 @@ describe("os elos que somem sem barulho", () => {
     expect(readFileSync("lib/schemas/settings.ts", "utf8")).toMatch(/const LOCALES = IDIOMAS;/);
   });
 
-  it("o seletor oferece só o que MUDA a tela", () => {
-    // `en-US` saiu: nunca teve tradução. Oferecer um idioma que não muda nada é
-    // prometer o que a tela não cumpre.
-    //
-    // Este caso casava `value="es">Español` no texto do formulário. A lista
-    // passou a vir do registro de idiomas, filtrada pelo nível, e quem prende o
-    // que as duas telas de Configurações OFERECEM é o render em
-    // `tests/unit/idioma-aparece-pelo-nivel-do-registro.test.tsx`. Aqui fica o
-    // que o render não vê: ninguém volta a escrever um idioma à mão.
+  it("AutoVenta: Configuración no ofrece elegir idioma", () => {
+    // El producto es solo para Argentina y se usa en español (decisión de
+    // Tomás, 2026-11-23). Ni Perfil ni Organización vuelven a tener el campo,
+    // y nadie vuelve a listar idiomas a mano.
     for (const arquivo of ["app/app/settings/profile/_form.tsx", "app/app/settings/tenant/_form.tsx"]) {
       const fonte = readFileSync(arquivo, "utf8");
-      expect(fonte, `${arquivo} voltou a listar idioma à mão`).not.toMatch(
+      expect(fonte, `${arquivo} volvió a listar idiomas a mano`).not.toMatch(
         /<SelectItem\s+value="(pt-BR|es|en-US|zh-CN)"/,
       );
-      expect(fonte, `${arquivo} deixou de ler a lista do registro`).toMatch(/IDIOMAS_VISIVEIS\.map/);
+      expect(fonte, `${arquivo} volvió a ofrecer el campo Idioma`).not.toMatch(/IDIOMAS_VISIVEIS|htmlFor="locale"/);
     }
   });
 

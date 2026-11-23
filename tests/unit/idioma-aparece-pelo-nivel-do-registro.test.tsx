@@ -123,49 +123,38 @@ describe("em construção não chega a ninguém", () => {
   });
 });
 
-describe("as telas de Configurações oferecem o que o registro deixa aparecer", () => {
-  /**
-   * O Radix Select espelha as opções num `<select>` nativo oculto; é ali que se
-   * lê a lista sem abrir o menu. Os valores são os CÓDIGOS, e os rótulos são o
-   * nome de cada língua nela própria.
-   */
-  function opcoesDoIdioma(): { valor: string; rotulo: string }[] {
-    const gatilho = screen.getByRole("combobox", { name: "Idioma" });
-    const nativo = gatilho.parentElement?.querySelector("select");
-    expect(nativo, "o <select> nativo do campo Idioma não foi achado").toBeTruthy();
-    return [...(nativo?.querySelectorAll("option") ?? [])]
-      .filter((opcao) => opcao.value !== "")
-      .map((opcao) => ({ valor: opcao.value, rotulo: opcao.textContent ?? "" }));
-  }
-
-  const esperadas = VISIVEIS.map((idioma) => ({ valor: idioma.codigo, rotulo: idioma.nomeNativo }));
-
-  it("perfil: 'seguir a empresa' mais os idiomas visíveis, e nada além", () => {
+/**
+ * AutoVenta es solo para Argentina: ninguna pantalla de Configuración ofrece
+ * elegir idioma (decisión de Tomás, 2026-11-23). El registro sigue decidiendo
+ * qué idioma se sirve; la pantalla ya no es una puerta para cambiarlo.
+ */
+describe("AutoVenta: Configuración no ofrece elegir idioma", () => {
+  it("perfil: sin campo Idioma", () => {
     render(
-      <IdiomaProvider locale="pt-BR">
+      <IdiomaProvider locale="es">
         <ProfileForm
           email="dona@empresa.com"
           initialFullName="Dona da Empresa"
           initialAvatarUrl={null}
           initialLocale="pt-BR"
-          initialTimezone="America/Sao_Paulo"
+          initialTimezone="America/Argentina/Buenos_Aires"
         />
       </IdiomaProvider>,
     );
-    expect(opcoesDoIdioma().filter((opcao) => opcao.valor !== "auto")).toEqual(esperadas);
+    expect(screen.queryByRole("combobox", { name: "Idioma" })).toBeNull();
   });
 
-  it("organização: os idiomas visíveis, e nada além", () => {
+  it("organización: sin campo Idioma", () => {
     render(
-      <IdiomaProvider locale="pt-BR">
+      <IdiomaProvider locale="es">
         <TenantForm
           initial={{
             display_name: "Empresa",
-            legal_name: "Empresa Ltda",
+            legal_name: "Empresa SA",
             cnpj: null,
-            timezone: "America/Sao_Paulo",
-            locale: "pt-BR",
-            currency: "BRL",
+            timezone: "America/Argentina/Buenos_Aires",
+            locale: "es",
+            currency: "ARS",
             media_retention_days: 365,
             media_retention_enforced: true,
             dpo_email: null,
@@ -174,6 +163,6 @@ describe("as telas de Configurações oferecem o que o registro deixa aparecer",
         />
       </IdiomaProvider>,
     );
-    expect(opcoesDoIdioma()).toEqual(esperadas);
+    expect(screen.queryByRole("combobox", { name: "Idioma" })).toBeNull();
   });
 });

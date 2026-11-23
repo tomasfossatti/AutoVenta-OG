@@ -15,12 +15,7 @@ import {
 } from "@/components/ui/select";
 import { updateProfile } from "@/app/actions/settings/updateProfile";
 import { useT } from "@/hooks/i18n/useT";
-import { IDIOMAS_VISIVEIS } from "@/lib/i18n/registro";
-import {
-  profileSchema,
-  SEM_PREFERENCIA_DE_IDIOMA,
-  type Locale,
-} from "@/lib/schemas/settings";
+import { profileSchema, SEM_PREFERENCIA_DE_IDIOMA, type Locale } from "@/lib/schemas/settings";
 import { FUSOS_OFERECIDOS } from "@/lib/tempo/fusos";
 
 // A mesma lista de toda tela de fuso — ver `lib/tempo/fusos.ts`.
@@ -30,6 +25,7 @@ interface Props {
   email: string;
   initialFullName: string | null;
   initialAvatarUrl: string | null;
+  /** Ya no se muestra: AutoVenta no deja elegir idioma. Queda por la página que lo pasa. */
   initialLocale: Locale | typeof SEM_PREFERENCIA_DE_IDIOMA;
   initialTimezone: string;
 }
@@ -38,12 +34,10 @@ export function ProfileForm({
   email,
   initialFullName,
   initialAvatarUrl,
-  initialLocale,
   initialTimezone,
 }: Props) {
   const t = useT();
   const [fullName, setFullName] = useState(initialFullName ?? "");
-  const [locale, setLocale] = useState<Locale | typeof SEM_PREFERENCIA_DE_IDIOMA>(initialLocale);
   const [timezone, setTimezone] = useState(initialTimezone);
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl ?? "");
   const [isPending, startTransition] = useTransition();
@@ -52,7 +46,9 @@ export function ProfileForm({
     e.preventDefault();
     const parsed = profileSchema.safeParse({
       full_name: fullName || null,
-      locale,
+      // AutoVenta es solo para Argentina: no se elige idioma. Guardar el perfil
+      // deja a la persona siguiendo el de la organización (español).
+      locale: SEM_PREFERENCIA_DE_IDIOMA,
       timezone,
       avatar_url: avatarUrl || null,
     });
@@ -87,28 +83,6 @@ export function ProfileForm({
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label htmlFor="locale">{t("Idioma")}</Label>
-            <Select value={locale} onValueChange={(v) => setLocale(v as Locale)}>
-              <SelectTrigger id="locale">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value={SEM_PREFERENCIA_DE_IDIOMA}>
-                  {t("Seguir o idioma da empresa")}
-                </SelectItem>
-                {/* A lista vem do registro, e só com o que o nível deixa
-                    aparecer. Oferecer um idioma que não muda a tela é prometer
-                    o que ela não cumpre — `en-US` saiu por isso, e um idioma
-                    em construção fica fora pela mesma razão. */}
-                {IDIOMAS_VISIVEIS.map(({ codigo, nomeNativo }) => (
-                  <SelectItem key={codigo} value={codigo}>
-                    {nomeNativo}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
           <div className="space-y-2">
             <Label htmlFor="timezone">{t("Fuso horário")}</Label>
             <Select value={timezone} onValueChange={setTimezone}>
