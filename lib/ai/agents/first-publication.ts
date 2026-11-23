@@ -4,6 +4,8 @@ import { capacidadesPadraoDoOnboarding } from "./capacidades-padrao";
 import { escolherModeloDoProvedor } from "./escolher-modelo";
 import { chaveDePlataforma } from "@/lib/ai/runtime/agent";
 import { publishAgentVersion } from "./publish";
+import { palavrasDePassagemPadrao } from "./palavras-de-passagem-padrao";
+import { idiomaDoAviso } from "@/lib/i18n/idioma-do-aviso";
 interface AgenteDoOnboarding {
   id: string;
   published_version_id: string | null;
@@ -263,6 +265,12 @@ export async function publishFirstVersion(
     };
   }
 
+  // As palavras de passagem no idioma da organização. Sem isto a versão herdava
+  // o default do banco, em português, e uma agência em `es` nascia com
+  // "falar com humano" (`palavras-de-passagem-padrao.ts`). A leitura nunca
+  // lança: banco fora ou coluna nula caem em pt-BR, o comportamento de antes.
+  const idiomaDaOrganizacao = await idiomaDoAviso(admin, orgId);
+
   const { data: version, error: versionErr } = await admin
     .from("ai_agent_versions")
     .insert({
@@ -282,6 +290,7 @@ export async function publishFirstVersion(
       tool_ids: selection ? [] : capacidadesPadraoDoOnboarding(),
       pipeline_ids: pipelineIds,
       channel_session_id: canal.id,
+      handoff_keywords: palavrasDePassagemPadrao(idiomaDaOrganizacao),
       status: "draft",
       created_by: userId,
     })

@@ -33,6 +33,9 @@ import {
 import { TokenCounter } from "@/lib/ui/TokenCounter";
 import { Info } from "@/lib/ui/icons";
 import { useT } from "@/hooks/i18n/useT";
+import { useIdioma } from "@/lib/i18n/IdiomaProvider";
+import type { Idioma } from "@/lib/i18n/idiomas";
+import { palavrasDePassagemPadrao } from "@/lib/ai/agents/palavras-de-passagem-padrao";
 import Link from "next/link";
 
 import { TETO_TOOLS_POR_AGENTE } from "@/lib/mcp/tools/selecao-por-pacote";
@@ -314,6 +317,11 @@ export function buildState(args: {
   version: AgentVersionRow | null;
   t: (texto: string) => string;
   /**
+   * O idioma de quem configura — decide as palavras de passagem de um agente
+   * NOVO (`palavras-de-passagem-padrao.ts`). Ausente = português, o de antes.
+   */
+  idioma?: Idioma;
+  /**
    * O provedor que a ORGANIZAÇÃO já usa (`organizations.settings.llm.provider`).
    *
    * Sem isto, um agente NOVO nascia `anthropic` — e o formulário mostrava
@@ -348,11 +356,7 @@ export function buildState(args: {
     cost_budget_cents: version?.cost_budget_cents ?? 50,
     history_message_window: version?.history_message_window ?? 20,
     history_token_window: version?.history_token_window ?? 8_000,
-    handoff_keywords: version?.handoff_keywords ?? [
-      "falar com humano",
-      "atendente",
-      "pessoa real",
-    ],
+    handoff_keywords: version?.handoff_keywords ?? palavrasDePassagemPadrao(args.idioma ?? "pt-BR"),
     handoff_tool_enabled: version?.handoff_tool_enabled ?? true,
     handoff_legal_enabled: version?.handoff_legal_enabled ?? true,
     // `?? true`: a versão de antes da 9108 via as fotos, e continua vendo.
@@ -480,6 +484,7 @@ function payloadQueSeraGravado(s: FormState) {
 
 export function AgentForm(props: Props) {
   const t = useT();
+  const idioma = useIdioma();
   const funis = props.funis ?? [];
   const materiais = props.materiais ?? [];
   const skills = props.skills ?? [];
@@ -493,15 +498,16 @@ export function AgentForm(props: Props) {
       // O fallback existe para chamadores que ainda não a passam; sem ele, um
       // agente pausado abriria no texto padrão e o prompt "sumiria".
       const ref = props.base ?? props.draft ?? props.published;
-      return buildState({ agent: props.agent, version: ref, t });
+      return buildState({ agent: props.agent, version: ref, t, idioma });
     }
     return buildState({
       version: null,
       t,
+      idioma,
       provedorPadrao: props.provedorPadrao,
       provedoresOferecidos: props.provedoresOferecidos,
     });
-  }, [isEdit, props, t]);
+  }, [isEdit, props, t, idioma]);
 
   const [form, setForm] = React.useState<FormState>(baseline);
   const [saving, setSaving] = React.useState(false);

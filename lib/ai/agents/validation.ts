@@ -15,6 +15,7 @@ import { VALID_TOOL_IDS } from "@/lib/mcp/tools/catalog";
 import { TETO_TOOLS_POR_AGENTE } from "@/lib/mcp/tools/selecao-por-pacote";
 import { TETO_DO_PUBLICO } from "@/lib/agent-engine/agent/publico-do-gatilho";
 import { IDS_DE_PROVEDOR } from "@/lib/ai/pontos/provedores";
+import { PALAVRAS_DE_PASSAGEM_PT } from "./palavras-de-passagem-padrao";
 
 /**
  * Derivado de `lib/ai/pontos/provedores.ts` (a lista única desde a 0127). Como
@@ -224,7 +225,9 @@ const versionShapeSchema = z
     handoff_keywords: z
       .array(z.string().trim().min(1).max(60))
       .max(20)
-      .default(["falar com humano", "atendente", "pessoa real"]),
+      // O piso de quem cria versão pela API sem dizer nada: o mesmo do banco.
+      // O idioma da organização entra na primeira publicação e no formulário.
+      .default([...PALAVRAS_DE_PASSAGEM_PT]),
     handoff_tool_enabled: z.boolean().default(true),
     // Passar para uma pessoa por ASSUNTO JURÍDICO — irmão da linha acima, com
     // o MESMO molde: booleano com default LIGADO (#2097, #2156). O default é
