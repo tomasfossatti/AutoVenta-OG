@@ -25,7 +25,7 @@ export const TEXTOS_AUTOVENTA_PUBLICO = {
     {
       es: "Cargás las unidades o las importás desde una planilla, y el agente solo ofrece lo que está disponible. Una unidad señada deja de ofrecerse.",
     },
-  "Usado na troca e avaliação": { es: "Usado en parte de pago y tasación" },
+  "Usado na troca e avaliação": { es: "Tu usado, en parte de pago" },
   "O agente junta os dados do usado que o cliente quer entregar e pede a avaliação à equipe. O valor é sempre dado por uma pessoa, nunca inventado pela IA.":
     {
       es: "El agente junta los datos del usado que el cliente quiere entregar y le pide la tasación al equipo. El valor siempre lo pone una persona, nunca lo inventa la IA.",
