@@ -206,6 +206,9 @@ jobs:
             title: DeskcommCRM voice agent
         name: [deskcommcrm, deskcomm-worker, deskcomm-scheduler, deskcomm-voice-agent]
         arch: [amd64, arm64]
+        # AutoVenta: en push a `main` solo arm64 (la Mac-servidor). Las tags de
+        # versión (`v*`) siguen saliendo en amd64 + arm64.
+        exclude: ${{ fromJSON(github.ref_type == 'tag' && '[]' || '[{"arch":"amd64"}]') }}
 
     steps:
       - uses: actions/checkout@v7
@@ -347,11 +350,18 @@ jobs:
       - name: Unir AMD64 e ARM64 em cada tag
         env:
           TAGS: ${{ steps.meta.outputs.tags }}
+          # AutoVenta: en push a `main` solo se construye arm64 (ver build-and-push).
+          SOLO_ARM64: ${{ github.ref_type != 'tag' }}
         run: |
           set -euo pipefail
           source hostgator-setup-kit/_manifestos.sh
           while IFS= read -r tag; do
             [ -n "$tag" ] || continue
+            if [ "$SOLO_ARM64" = true ]; then
+              docker buildx imagetools create --tag "$tag" "${tag}-arm64"
+              manifesto_tem_plataforma "$tag" linux/arm64
+              continue
+            fi
             docker buildx imagetools create \
               --tag "$tag" \
               "${tag}-amd64" \
