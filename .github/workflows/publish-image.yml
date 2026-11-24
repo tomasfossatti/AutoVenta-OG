@@ -240,6 +240,9 @@ jobs:
             suffix=-${{ matrix.arch }},onlatest=true
           tags: |
             type=ref,event=branch
+            # Tag INMUTABLE por commit (`sha-<7>`): é o que a Mac do AutoVenta
+            # instala (servidor/desplegar.sh). `main`/`latest` andam a cada push.
+            type=sha,prefix=sha-,format=short
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             # `enable={{is_default_branch}}` NÃO basta: o metadata-action o
@@ -334,6 +337,9 @@ jobs:
           flavor: latest=false
           tags: |
             type=ref,event=branch
+            # Tag INMUTABLE por commit (`sha-<7>`): é o que a Mac do AutoVenta
+            # instala (servidor/desplegar.sh). `main`/`latest` andam a cada push.
+            type=sha,prefix=sha-,format=short
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=raw,value=latest,enable=${{ github.ref_type == 'branch' && github.ref_name == 'main' }}

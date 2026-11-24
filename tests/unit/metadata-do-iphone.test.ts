@@ -8,7 +8,7 @@ import type * as Instalacao from "@/lib/branding/instalacao";
  * o `<title>` longo da página.
  */
 vi.mock("next/font/local", () => ({ default: () => ({ variable: "" }) }));
-vi.mock("next/headers", () => ({ headers: vi.fn() }));
+vi.mock("next/headers", () => ({ headers: vi.fn().mockResolvedValue(new Headers()) }));
 vi.mock("@/lib/branding/instalacao", async (original) => ({
   ...(await original<typeof Instalacao>()),
   marcaDaInstalacao: vi.fn().mockResolvedValue({ app_name: "Central", favicon_path: "platform/x.png" }),
