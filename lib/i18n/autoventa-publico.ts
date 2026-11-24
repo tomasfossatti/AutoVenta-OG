@@ -20,7 +20,7 @@ export const TEXTOS_AUTOVENTA_PUBLICO = {
     {
       es: "Responde al instante con tu stock real de 0 km y usados: precio, fotos, kilómetros y disponibilidad. Cuando la consulta está lista para cerrar, le pasa la conversación al vendedor, con todo registrado.",
     },
-  "Estoque em dia": { es: "Stock al día" },
+  "Estoque em dia": { es: "Tu stock, siempre al día" },
   "Você cadastra ou importa as unidades por planilha, e o agente só oferece o que está disponível. Unidade com sinal deixa de ser oferecida.":
     {
       es: "Cargás las unidades o las importás desde una planilla, y el agente solo ofrece lo que está disponible. Una unidad señada deja de ofrecerse.",
