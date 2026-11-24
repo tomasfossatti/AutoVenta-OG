@@ -30,7 +30,7 @@ export const TEXTOS_AUTOVENTA_PUBLICO = {
     {
       es: "El agente junta los datos del usado que el cliente quiere entregar y le pide la tasación al equipo. El valor siempre lo pone una persona, nunca lo inventa la IA.",
     },
-  "Cada operação no funil": { es: "Cada operación en el embudo" },
+  "Cada operação no funil": { es: "Cada operación, paso a paso" },
   "Da primeira consulta ao sinal e à entrega: cada vendedor vê em que ponto está cada cliente.": {
     es: "De la primera consulta a la seña y la entrega: cada vendedor ve en qué punto está cada cliente.",
   },
