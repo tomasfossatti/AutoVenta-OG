@@ -2,8 +2,9 @@ name: ci
 
 on:
   pull_request:
-  push:
-    branches: [main]
+  # AutoVenta: el push a `main` no repite el CI (ya corrió entero en el PR) y
+  # así no le ocupa la cola a publish-image. A mano: `gh workflow run ci.yml`.
+  workflow_dispatch:
 
 # O GITHUB_TOKEN destes jobs serve a `actions/checkout` (clone) e a
 # `actions/setup-node` (manifest de `actions/node-versions`, repo público) —
