@@ -30,6 +30,8 @@ import {
 import { rotuloDoLocal } from "@/lib/agenda/locais";
 import { diaLocalISO } from "@/lib/agenda/fuso";
 import { rotuloLocal } from "@/lib/tempo/agora";
+import { idiomaDoAviso } from "@/lib/i18n/idioma-do-aviso";
+import type { Idioma } from "@/lib/i18n/idiomas";
 import {
   alterarAgendamentoHandler,
   cancelarAgendamentoHandler,
@@ -247,6 +249,7 @@ function payloadDeHorarios(
   consulta: ConsultaOk,
   slotsDoPeriodo: ConsultaOk["slots"],
   limite: number,
+  idioma?: Idioma,
 ) {
   // O fuso é o DA REGRA (a jornada do atendente), nunca o da organização: é nele
   // que os horários foram calculados, e é o que esta resposta já publica.
@@ -260,7 +263,7 @@ function payloadDeHorarios(
       fim: s.fim.toISOString(),
       // `quando` é para FALAR com a pessoa. Um só, e do início: o fim não
       // responde pergunta nenhuma (a duração é do tipo) e dobraria o custo.
-      quando: rotuloLocal(s.inicio, consulta.fusoDaRegra),
+      quando: rotuloLocal(s.inicio, consulta.fusoDaRegra, idioma),
     })),
     // Sem estes dois, uma lista cortada é indistinguível de uma agenda que
     // acabou — o mesmo modo de falha que `publicou_horarios` existe para
@@ -411,7 +414,7 @@ export const crmFindFreeSlots: McpToolDefinition<typeof horariosLivresShape> = {
             const local = diaLocalISO(s.inicio, consulta.fusoDaRegra);
             return comPeriodo ? local >= diaPedido : local === diaPedido;
           });
-    return payloadDeHorarios(consulta, slotsDoPeriodo, input.limite ?? HORARIOS_PADRAO);
+    return payloadDeHorarios(consulta, slotsDoPeriodo, input.limite ?? HORARIOS_PADRAO, await idiomaDoAviso(ctx.supabase, ctx.organizationId));
   },
 };
 
@@ -573,6 +576,7 @@ export const crmListAppointments: McpToolDefinition<typeof listarShape> = {
       ctx.organizationId,
       r.agendamentos.map((a) => a.donoId),
     );
+    const idioma = await idiomaDoAviso(ctx.supabase, ctx.organizationId);
 
     return {
       compromissos: r.agendamentos.map((a) => ({
@@ -581,8 +585,8 @@ export const crmListAppointments: McpToolDefinition<typeof listarShape> = {
         inicio: a.iniciaEm,
         fim: a.terminaEm,
         fuso: a.fuso,
-        quando: rotuloLocal(new Date(a.iniciaEm), a.fuso),
-        fim_quando: rotuloLocal(new Date(a.terminaEm), a.fuso),
+        quando: rotuloLocal(new Date(a.iniciaEm), a.fuso, idioma),
+        fim_quando: rotuloLocal(new Date(a.terminaEm), a.fuso, idioma),
         situacao: a.situacao,
         ...(a.authority && a.authority !== "local"
           ? { authority: a.authority, external_status: a.external_status, external_connection_id: a.external_connection_id }
@@ -720,13 +724,13 @@ async function convidadoEhDaEquipe(ctx: McpContext, email: string): Promise<bool
 }
 
 /** A escrita conserva seus instantes; a IA recebe também a hora de parede. */
-function compromissoComHorarioLocal(r: Record<string, unknown>): Record<string, unknown> {
+function compromissoComHorarioLocal(r: Record<string, unknown>, idioma?: Idioma): Record<string, unknown> {
   if (typeof r.starts_at !== "string" || typeof r.time_zone !== "string") return r;
   return {
     ...r,
-    quando: rotuloLocal(new Date(r.starts_at), r.time_zone),
+    quando: rotuloLocal(new Date(r.starts_at), r.time_zone, idioma),
     ...(typeof r.ends_at === "string"
-      ? { fim_quando: rotuloLocal(new Date(r.ends_at), r.time_zone) }
+      ? { fim_quando: rotuloLocal(new Date(r.ends_at), r.time_zone, idioma) }
       : {}),
   };
 }
@@ -872,7 +876,7 @@ export const crmBookAppointment: McpToolDefinition<typeof marcarShape> = {
 
       return {
         marcado: r.service_occurrence_id ? r.status === "pending" || r.status === "confirmed" : true,
-        compromisso: compromissoComHorarioLocal(r),
+        compromisso: compromissoComHorarioLocal(r, await idiomaDoAviso(ctx.supabase, ctx.organizationId)),
         // Campo próprio, além da mensagem: um booleano no topo é o que o modelo
         // enxerga sem precisar interpretar prosa.
         aguarda_confirmacao: aguardaConfirmacao,
@@ -1037,7 +1041,7 @@ export const crmFindAndBookAppointment: McpToolDefinition<typeof consultarEMarca
 
     if (achado === undefined) {
       return {
-        ...payloadDeHorarios(consulta, slotsDoDia, HORARIOS_PADRAO),
+        ...payloadDeHorarios(consulta, slotsDoDia, HORARIOS_PADRAO, await idiomaDoAviso(ctx.supabase, ctx.organizationId)),
         marcado: false,
         motivo: "horario_indisponivel",
         // O tom importa: o cliente não fez nada errado, e "não está livre" NÃO é
@@ -1087,6 +1091,7 @@ export const crmFindAndBookAppointment: McpToolDefinition<typeof consultarEMarca
           ? slotsDoDia
           : slotsDoDia.filter((s) => s !== achado),
         HORARIOS_PADRAO,
+        await idiomaDoAviso(ctx.supabase, ctx.organizationId),
       );
       // ⚠️ E o ensino só é REESCRITO quando a recusa é o horário que ficou
       // indisponível e SOBROU opção no dia. O texto de `ENSINO_POR_CODIGO` para
@@ -1118,7 +1123,7 @@ export const crmFindAndBookAppointment: McpToolDefinition<typeof consultarEMarca
       // O horário que ESTA chamada usou, explícito: o modelo não precisa deduzir
       // de dentro de `compromisso` o que ele mesmo pediu.
       inicio: achado.inicio.toISOString(),
-      quando: rotuloLocal(achado.inicio, consulta.fusoDaRegra),
+      quando: rotuloLocal(achado.inicio, consulta.fusoDaRegra, await idiomaDoAviso(ctx.supabase, ctx.organizationId)),
       agenda_externa_nunca_lida: consulta.agendaExternaNuncaLida,
       // ⚠️ A ressalva vai JUNTO da confirmação, e concatenada — não por cima. O
       // texto que `resultado` traz é o da marcação ("marquei tal dia"), e é ele
@@ -1171,7 +1176,7 @@ export const crmRescheduleAppointment: McpToolDefinition<typeof remarcarShape> =
           ...(input.notes ? { notes: input.notes } : {}),
         },
       );
-      return { remarcado: true, compromisso: compromissoComHorarioLocal(r) };
+      return { remarcado: true, compromisso: compromissoComHorarioLocal(r, await idiomaDoAviso(ctx.supabase, ctx.organizationId)) };
     }),
 };
 
@@ -1206,7 +1211,7 @@ export const crmCancelAppointment: McpToolDefinition<typeof cancelarShape> = {
         { organization_id: ctx.organizationId, actor: ctx.actor, requestId: ctx.requestId, amigoAgentExecution: Boolean(ctx.contatoDoTurno), amigoAgentToolIds: ctx.amigoAgentToolIds },
         { id: input.appointment_id, reason: input.reason },
       );
-      return { cancelado: true, compromisso: compromissoComHorarioLocal(r) };
+      return { cancelado: true, compromisso: compromissoComHorarioLocal(r, await idiomaDoAviso(ctx.supabase, ctx.organizationId)) };
     }),
 };
 
@@ -1241,7 +1246,7 @@ export const crmConfirmAppointment: McpToolDefinition<typeof confirmarShape> = {
           ...(input.notes ? { notes: input.notes } : {}),
         },
       );
-      return { confirmado: true, compromisso: compromissoComHorarioLocal(r) };
+      return { confirmado: true, compromisso: compromissoComHorarioLocal(r, await idiomaDoAviso(ctx.supabase, ctx.organizationId)) };
     }),
 };
 
@@ -1314,6 +1319,6 @@ export const crmSetAppointmentOutcome: McpToolDefinition<typeof desfechoShape> =
       } catch {
         negocio = null;
       }
-      return { registrado: true, compromisso: compromissoComHorarioLocal(r), negocio };
+      return { registrado: true, compromisso: compromissoComHorarioLocal(r, await idiomaDoAviso(ctx.supabase, ctx.organizationId)), negocio };
     }),
 };

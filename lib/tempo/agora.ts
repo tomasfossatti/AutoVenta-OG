@@ -42,6 +42,7 @@
 
 import { partesNoFuso, diaDaSemanaLocal, offsetEmMinutos } from "@/lib/agenda/fuso";
 import { FUSO_PADRAO, fusoValido } from "@/lib/tempo/fusos";
+import type { Idioma } from "@/lib/i18n/idiomas";
 
 /**
  * Domingo = 0, a mesma régua de `diaDaSemanaLocal` e do `dow` da jornada.
@@ -61,6 +62,9 @@ const DIAS_DA_SEMANA = [
   "sexta-feira",
   "sábado",
 ] as const;
+
+/** Mesma régua (domingo = 0), em espanhol — os nomes que a Argentina usa. */
+const DIAS_DA_SEMANA_ES = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"] as const;
 
 const doisDigitos = (n: number): string => String(n).padStart(2, "0");
 
@@ -179,9 +183,25 @@ export function instanteDoBanco(valor: unknown): string | null {
   return null;
 }
 
-export function rotuloLocal(instante: Date, fuso: string): string {
+/**
+ * "terça-feira 01/12 às 09:00" — o rótulo de um instante, na hora de parede do fuso.
+ *
+ * `idioma` é opcional e o padrão é o português de sempre: quem não o passa
+ * recebe byte a byte o texto que tinha antes. Só `es` muda a frase ("martes
+ * 01/12 a las 09:00"); qualquer outro idioma segue em português, de propósito —
+ * traduzir é um passe por idioma, não um efeito colateral deste.
+ */
+export function rotuloLocal(instante: Date, fuso: string, idioma?: Idioma): string {
   const fusoEmVigor = fusoValido(fuso) ? fuso : FUSO_PADRAO;
   const p = partesNoFuso(instante, fusoEmVigor);
-  const diaDaSemana = DIAS_DA_SEMANA[new Date(Date.UTC(p.ano, p.mes - 1, p.dia)).getUTCDay()] ?? "";
-  return `${diaDaSemana} ${doisDigitos(p.dia)}/${doisDigitos(p.mes)} às ${doisDigitos(p.hora)}:${doisDigitos(p.minuto)}`;
+  const dow = new Date(Date.UTC(p.ano, p.mes - 1, p.dia)).getUTCDay();
+  const data = `${doisDigitos(p.dia)}/${doisDigitos(p.mes)}`;
+  const hora = `${doisDigitos(p.hora)}:${doisDigitos(p.minuto)}`;
+  if (idioma === "es") {
+    // Só a 01:00 é singular ("a la 01:00"); 13:00 e todas as demais são "a las".
+    const artigo = p.hora === 1 ? "a la" : "a las";
+    return `${DIAS_DA_SEMANA_ES[dow] ?? ""} ${data} ${artigo} ${hora}`;
+  }
+  const diaDaSemana = DIAS_DA_SEMANA[dow] ?? "";
+  return `${diaDaSemana} ${data} às ${hora}`;
 }
