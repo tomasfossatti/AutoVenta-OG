@@ -10,6 +10,8 @@
  */
 import { describe, expect, it } from "vitest";
 
+import type { Idioma } from "@/lib/i18n/idiomas";
+
 import { rotuloLocal } from "./agora";
 
 const FUSO = "America/Argentina/Buenos_Aires"; // UTC-3, sem horário de verão
@@ -50,8 +52,12 @@ describe("rotuloLocal — idioma", () => {
     expect(rotuloLocal(terca0900, "Asia/Tokyo", "es")).toBe("martes 01/12 a las 21:00");
   });
 
-  it("um idioma que ainda não foi traduzido segue em português, sem lançar", () => {
-    expect(rotuloLocal(terca0900, FUSO, "en")).toBe("terça-feira 01/12 às 09:00");
+  it("um valor de idioma inesperado (vindo do banco) segue em português, sem lançar", () => {
+    // `Idioma` só admite os idiomas servidos; o cast simula o que a coluna
+    // `organizations.locale`, sem CHECK, pode entregar de verdade.
+    expect(rotuloLocal(terca0900, FUSO, "en" as unknown as Idioma)).toBe(
+      "terça-feira 01/12 às 09:00",
+    );
   });
 
   it("fuso inválido cai no padrão e não lança (o turno do agente não pode morrer por isso)", () => {
